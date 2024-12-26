@@ -1,0 +1,20 @@
+.mySwiper {
+  margin-top: 10px;
+  height: 400px;
+}
+.swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (max-width: 600px) {
+  .mySwiper {
+    height: 200px;
+  }
+}
+@media (min-width: 601px) and (max-width: 960px) {
+  .mySwiper {
+    height: 300px;
+  }
+}
