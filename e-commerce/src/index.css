@@ -2,12 +2,19 @@
 @import 'swiper/css/navigation';
 
 
-.color{
-  color: #021024;
-  color: #052659;
-  color: #5483B3;
-  color: #7DA0CA;
-  color: #C1E8FF;
+:root{
+  --color11: #021024;
+  --color12: #052659;
+  --color13: #5483B3;
+  --color14: #7DA0CA;
+  --color15: #C1E8FF;
+
+  --color1: #80EE98;  
+  --color2: #46DFB1;
+  --color3: #09D1C7;
+  --color4: #15919B;
+  --color5: #0C6478;
+  --color6: #213A58;
 }
 
 * {
@@ -28,5 +35,5 @@
 }
 
 body {
-  /* height: 6666px; */
+  background-color: var(--color15) !important;
 }
