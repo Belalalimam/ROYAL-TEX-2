@@ -20,6 +20,7 @@ const Header = ({ onWishlistClick, wishlistItems }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   const settings = useMemo(() => {
     if (user?.isAdmin) {
@@ -201,7 +202,7 @@ const Header = ({ onWishlistClick, wishlistItems }) => {
                     {user ? (
                       <Avatar
                         alt={user.name}
-                        src={user.avatar || '/default-avatar.png'}
+                        src={userInfo.imageUrl || '/default-avatar.png'}
                       />
                     ) : (
                       <FaUser />

@@ -28,6 +28,13 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       minlength: 8,
     },
+    productImage: {
+      type: Object,
+      default: {
+        url: "",
+        publicId: null,
+      },
+    },
     token: {
       type: String,
     },

@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Paper, Typography, Box } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom'
 import swal from "sweetalert";
 import { useSelector, useDispatch } from "react-redux";
 import { registerUser } from '../../../redux/apiCalls/authApiCalls';
-
+import GoogleLogin from 'react-google-login';
+import { gapi } from 'gapi-script';
+import { Helmet } from 'react-helmet';
 
 
 const Register = () => {
@@ -13,6 +15,14 @@ const Register = () => {
   const { registerMessage } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    gapi.load('client:auth2', () => {
+      gapi.auth2.init({
+        client_id: '1033354121282-u5gtukmv264p62cb925373op610hccq3.apps.googleusercontent.com'
+      });
+    });
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -27,16 +37,20 @@ const Register = () => {
 
   };
 
-  if(registerMessage) {
+  if (registerMessage) {
     swal({
-        title: registerMessage,
-        icon: "success"
+      title: registerMessage,
+      icon: "success"
     }).then(isOk => {
-        if(isOk) {
-           navigate("/login");
-        }
+      if (isOk) {
+        navigate("/login");
+      }
     })
-}
+  }
+
+  const responseGoogle = (response) => {
+    dispatch(handleGoogleLogin(response));
+  };
 
   return (
     <Box
@@ -87,6 +101,15 @@ const Register = () => {
           >
             Sign Up
           </Button>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
+            <GoogleLogin
+              clientId="1033354121282-u5gtukmv264p62cb925373op610hccq3.apps.googleusercontent.com"
+              buttonText="Login with Google"
+              onSuccess={responseGoogle}
+              onFailure={responseGoogle}
+              cookiePolicy={'single_host_origin'}
+            />
+          </Box>
           {errors.submit && (
             <Typography color="error" align="center">
               {errors.submit}
@@ -100,6 +123,15 @@ const Register = () => {
           </Typography>
         </form>
       </Paper>
+      <Helmet>
+        <script
+          src="https://accounts.google.com/gsi/client"
+          async
+          defer
+          onLoad={() => console.log('Google Identity Services script loaded successfully')}
+          onError={() => console.error('Failed to load Google Identity Services script')}
+        />
+      </Helmet>
     </Box>
   );
 };
