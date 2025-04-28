@@ -72,38 +72,6 @@ const link = `https://royal-tex.shutterfly-alu.com/users/${user._id}/verify/${ve
  ------------------------------------------------*/
 const loginUserCtrl = asyncWrapper(async (req, res) => {
   const { error } = validateLoginUser(req.body);
-  const { idToken } = req.body;
-  console.log("🚀 ~ loginUserCtrl ~ idToken:", idToken)
-  const authClient = new OAuth2Client(clientId)
-
-
-  if (idToken) {
-    authClient.VerificationToken({ idToken, audience: clientId })
-        .then(response => {
-            // console.log(response)
-            const { email_verified, email, name, picture } = response.payload
-            if (email_verified) {
-                Users.findOne({ email }).exec((err, user) => {
-                    if(user){
-                        return res.json(user)
-                    }
-                    else{
-                        let password = email + clientId
-                        let newUser = new Users({email,name,picture,password});
-                        newUser.save((err,data)=>{
-                            if(err){
-                                return res.status.json({error:"mongodb error"})
-                            }
-                            res.json(data)
-                        })
-                    }
-                })
-            }
-        })
-        .catch(err => { console.log(err) })
-}
-
-
 
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
@@ -161,6 +129,16 @@ const loginUserCtrl = asyncWrapper(async (req, res) => {
 });
 
 /**-----------------------------------------------
+ * @desc    Google Login User
+ * @route   /api/auth/googlelogin
+ * @method  POST
+ * @access  public
+ ------------------------------------------------*/
+ const googleLoginUserCtrl = asyncWrapper(async (req, res) => {
+  
+});
+
+/**-----------------------------------------------
  * @desc    Verify User Account
  * @route   /api/auth/:userId/verify/:token
  * @method  GET
@@ -192,5 +170,6 @@ const verifyUserAccountCtrl = asyncWrapper(async (req, res) => {
 module.exports = {
   registerUserCtrl,
   loginUserCtrl,
+  googleLoginUserCtrl,
   verifyUserAccountCtrl,
 };

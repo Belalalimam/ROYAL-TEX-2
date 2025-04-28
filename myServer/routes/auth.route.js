@@ -7,6 +7,8 @@ authRouter.route("/register").post(authController.registerUserCtrl);
 
 authRouter.route("/login").post(authController.loginUserCtrl);
 
+authRouter.route("/googleLogin").post(authController.googleLoginUserCtrl);
+
 authRouter.route("/:userId/verify/:token").get(authController.verifyUserAccountCtrl);
 
 module.exports = authRouter;
