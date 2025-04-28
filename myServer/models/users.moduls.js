@@ -7,6 +7,10 @@ const passwordComplexity = require("joi-password-complexity");
 
 const UserSchema = new mongoose.Schema(
   {
+    googleId: {
+      type: String,
+      unique: true
+    },
     name: {
       type: String,
       required: true,
@@ -20,6 +24,7 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       minlength: 5,
       maxlength: 100,
+      lowercase: true,
       unique: true,
     },
     password: {

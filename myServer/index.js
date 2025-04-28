@@ -9,10 +9,13 @@ const rateLimit = require("express-rate-limit")
 const xss = require("xss-clean")
 const hpp = require("hpp")
 require("dotenv").config();
+require('./config/passport');
 const mongoose = require("mongoose");
 const httpStatusText = require("./utils/httpStatusText");
 const helmet = require("helmet")
-// const error = require('./utils/appError')
+const passport = require('passport');
+const session = require('express-session');
+
 
 const url = process.env.MONGO_URL;
 const path = require("path");
@@ -26,7 +29,8 @@ const app = express();
 app.use(cors({
   // origin: "https://royal-tex.shutterfly-alu.com"
   // origin: "https://royal-tex.surge.sh"
-  origin: "http://localhost:5173"
+  origin: "http://localhost:5173",
+  credentials: true
 }));
 
 app.use(xss())
@@ -41,11 +45,28 @@ app.use(hpp())
 //   max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
 // }))
 
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    }
+  })
+);
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(express.json());
-
+ 
 app.use("/api/auth", routerAuth);
 app.use("/api/users", usersRouter);
 app.use("/products", routerProduct);
