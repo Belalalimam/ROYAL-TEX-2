@@ -36,6 +36,7 @@ const Login = () => {
 
   const responseGoogle = (response) => {
     dispatch(handleGoogleLogin(response));
+    console.log("🚀 ~ responseGoogle ~ response:", response)
   };
 
 
