@@ -9,8 +9,11 @@ export function loginUser(user, isGoogleLogin = false) {
     try {
       if (isGoogleLogin) {
         // Handle Google login
+        // const { data } = await request.post('/api/auth/login', user);
         dispatch(authActions.Login(user));
         localStorage.setItem('userInfo', JSON.stringify(user));
+        // window.location.reload();
+        console.log("🚀 ~ loginUser ~ data:", user)
       } else {
         // Handle manual login
         const { data } = await request.post('/api/auth/login', user);

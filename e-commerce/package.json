@@ -20,12 +20,8 @@
     "axios": "^1.7.7",
     "cors": "^2.8.5",
     "cros": "^1.0.1",
-<<<<<<< HEAD
     "framer-motion": "^11.11.17",
     "gapi-script": "^1.2.0",
-=======
-    "framer-motion": "^11.18.2",
->>>>>>> b8dd1b4db91ea91c1bd38d35caebe644b5b94e4e
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-google-login": "^5.2.2",

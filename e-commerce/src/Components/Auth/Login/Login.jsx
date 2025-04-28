@@ -12,10 +12,12 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const dispatch = useDispatch();
 
+  const clientId = '1033354121282-u5gtukmv264p62cb925373op610hccq3.apps.googleusercontent.com'
+
   useEffect(() => {
     gapi.load('client:auth2', () => {
       gapi.auth2.init({
-        client_id: '1033354121282-b5jsa3ij22lebct9mesb7ors78bp7qpc.apps.googleusercontent.com'
+        client_id: clientId
       });
     });
   }, []);
@@ -80,7 +82,7 @@ const Login = () => {
           
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
             <GoogleLogin
-              clientId="1033354121282-b5jsa3ij22lebct9mesb7ors78bp7qpc.apps.googleusercontent.com"
+              clientId= {clientId}
               buttonText="Login with Google"
               onSuccess={responseGoogle}
               onFailure={responseGoogle}
