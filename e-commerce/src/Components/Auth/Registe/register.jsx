@@ -10,19 +10,12 @@ import { Helmet } from 'react-helmet';
 
 
 const Register = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', });
+  const [formData, setFormData] = useState({ fullname: '', email: '', password: '', });
   const [errors, setErrors] = useState({});
   const { registerMessage } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    gapi.load('client:auth2', () => {
-      gapi.auth2.init({
-        client_id: '1033354121282-u5gtukmv264p62cb925373op610hccq3.apps.googleusercontent.com'
-      });
-    });
-  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -30,16 +23,19 @@ const Register = () => {
       [e.target.name]: e.target.value
     });
   };
+  
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(registerUser(formData));
+    console.log("🚀 ~ handleSubmit ~ handleSubmit:", handleSubmit)
 
   };
 
   if (registerMessage) {
     swal({
-      title: registerMessage,
+      title: registerMessage, 
       icon: "success"
     }).then(isOk => {
       if (isOk) {
@@ -47,10 +43,6 @@ const Register = () => {
       }
     })
   }
-
-  const responseGoogle = (response) => {
-    dispatch(handleGoogleLogin(response));
-  };
 
   return (
     <Box
@@ -66,18 +58,18 @@ const Register = () => {
           Register
         </Typography>
         <form onSubmit={handleSubmit}>
-          <TextField
+        <TextField
             fullWidth
-            label="Name"
-            name="name"
+            label="Full Name"
+            name="fullname" // Added the name attribute
             margin="normal"
-            value={formData.name}
+            value={formData.fullname}
             onChange={handleChange}
           />
           <TextField
             fullWidth
             label="Email"
-            name="email"
+            name="email" // Ensure name attribute is present
             type="email"
             margin="normal"
             value={formData.email}
@@ -86,12 +78,11 @@ const Register = () => {
           <TextField
             fullWidth
             label="Password"
-            name="password"
+            name="password" // Ensure name attribute is present
             type="password"
             margin="normal"
             value={formData.password}
             onChange={handleChange}
-
           />
           <Button
             type="submit"
@@ -101,15 +92,6 @@ const Register = () => {
           >
             Sign Up
           </Button>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
-            <GoogleLogin
-              clientId="1033354121282-u5gtukmv264p62cb925373op610hccq3.apps.googleusercontent.com"
-              buttonText="Login with Google"
-              onSuccess={responseGoogle}
-              onFailure={responseGoogle}
-              cookiePolicy={'single_host_origin'}
-            />
-          </Box>
           {errors.submit && (
             <Typography color="error" align="center">
               {errors.submit}

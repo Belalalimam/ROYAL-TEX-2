@@ -8,8 +8,9 @@ const {
 const VerificationToken = require("../models/VerificationToken");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
-const { OAuth2Client } = require('google-auth-library')
-const { verifyGoogleToken } = require('../middlewares/verifyGoogleToken');
+const { OAuth2Client } = require("google-auth-library");
+const { verifyGoogleToken } = require("../middlewares/verifyGoogleToken");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 /**-----------------------------------------------
  * @desc    Register New User
@@ -32,22 +33,21 @@ const registerUserCtrl = asyncWrapper(async (req, res) => {
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
   user = new Users({
-    name: req.body.name,
+    fullname: req.body.fullname,
     email: req.body.email,
     password: hashedPassword,
   });
   await user.save();
 
-// Creating new VerificationToken & save it toDB
-const verificationToken = new VerificationToken({
-  userId: user._id,
-  token: crypto.randomBytes(32).toString("hex"),
-});
-await verificationToken.save();
+  // Creating new VerificationToken & save it toDB
+  const verificationToken = new VerificationToken({
+    userId: user._id,
+    token: crypto.randomBytes(32).toString("hex"),
+  });
+  await verificationToken.save();
 
-// Making the link
-const link = `https://royal-tex.shutterfly-alu.com/users/${user._id}/verify/${verificationToken.token}`;
-
+  // Making the link
+  const link = `https://royal-tex.shutterfly-alu.com/users/${user._id}/verify/${verificationToken.token}`;
 
   // Putting the link into an html template
   const htmlTemplate = `
@@ -125,7 +125,7 @@ const loginUserCtrl = asyncWrapper(async (req, res) => {
     _id: user._id,
     isAdmin: user.isAdmin,
     token,
-    name: user.name,
+    fullname: user.fullname,
   });
 });
 
@@ -135,33 +135,56 @@ const loginUserCtrl = asyncWrapper(async (req, res) => {
  * @method  POST
  * @access  public
  ------------------------------------------------*/
- const googleLoginUserCtrl = asyncWrapper(async (req, res) => {
-  const { error } = validateRegisterUser(req.body);
-  if (error) {
-    console.log("🚀 ~ googleLoginUserCtrl ~ error:", error)
-    return res.status(400).json({ message: error.details[0].message });
-  }
-
-  let user = await Users.findOne({ email: req.body.email }); 
-  if (user) {
-    return res.status(400).json({ message: "user already exist" });
-  }
-
-
-  user = new Users({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password
-  });
-  await user.save();
-  console.log("🚀 ~ googleLoginUserCtrl ~ user:", user)
-
-
-  res.status(201).json({
-    message: "We sent to you an email, please verify your email address",
-  });
-});
- 
+const googleLoginUserCtrl = (passport) => {
+   passport.serializeUser(function (user, done) {
+     done(null, user.id);
+   });
+   passport.deserializeUser(function (id, done) {
+     Users.findById(id, function (err, user) {
+       done(err, user);
+     });
+   });
+   passport.use(
+     new GoogleStrategy(
+       {
+         clientID: process.env.GOOGLE_CLIENT_ID,
+         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+         callbackURL: "http://localhost:4000/api/auth/google/callback",
+       },
+       function (accessToken, refreshToken, profile, cb) {
+         console.log(profile);
+         Users.findOne({ googleId: profile.id }, async function (err, user) {
+           if (user) {
+             const updatedUser = {
+               fullname: profile.displayName,
+               email: profile.emails[0].value,
+               pic: profile.photos[0].value,
+               secret: accessToken,
+             };
+             await Users.findOneAndUpdate(
+               { _id: user.id },
+               { $set: updatedUser },
+               { new: true }
+             ).then((result) => {
+               return cb(err, result);
+             });
+           } else {
+             const newUser = new Users({
+               googleId: profile.id,
+               fullname: profile.displayName,
+               email: profile.emails[0].value,
+               pic: profile.photos[0].value,
+               secret: accessToken,
+             });
+             newUser.save().then((result) => {
+               return cb(err, result);
+             });
+           }
+         });
+       }
+     )
+   );
+ };
 
 /**-----------------------------------------------
  * @desc    Verify User Account
@@ -191,10 +214,22 @@ const verifyUserAccountCtrl = asyncWrapper(async (req, res) => {
 
   res.status(200).json({ message: "Your account verified" });
 });
+/**-----------------------------------------------
+ * @desc    Google Callback
+ * @route   /api/auth/google/callback
+ ------------------------------------------------*/
+ const googleCallbackCtrl = asyncWrapper(async (req, res) => {
+  console.log(req);
+  res.redirect(
+    // `http://localhost:4000?email=${req.user.email}&fullname=${req.user.fullname}&secret=${req.user.secret}`
+    `http://localhost:5173?email=${req.user.email}&fullname=${req.user.fullname}&secret=${req.user.secret}`
+  );
+});
 
 module.exports = {
   registerUserCtrl,
   loginUserCtrl,
   googleLoginUserCtrl,
   verifyUserAccountCtrl,
+  googleCallbackCtrl
 };

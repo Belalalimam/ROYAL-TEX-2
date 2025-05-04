@@ -1,37 +1,60 @@
-import React from 'react';
-import { GoogleLogin } from 'react-google-login';
-import { useDispatch } from 'react-redux';
-import { handleGoogleLogin } from '../../../redux/apiCalls/authApiCalls';
-import { gapi } from 'gapi-script';
-import { Box } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from "react-router-dom";
 
 const GoogleLoginButton = () => {
-  const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const [user, setUser] = useState(null);
+  
+  const email = searchParams.get("email");
+  const fullname = searchParams.get("fullname");
+  const secret = searchParams.get("secret");
 
-  const clientId = '1033354121282-u5gtukmv264p62cb925373op610hccq3.apps.googleusercontent.com'
+  // First useEffect to handle URL parameters and localStorage
+  useEffect(() => {
+    // Check if we have URL parameters
+    if (email && fullname && secret) {
+      const userData = {
+        email,
+        fullname,
+        secret,
+      };
+      
+      // Store in localStorage
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
+    } else {
+      // Try to get user from localStorage if no URL parameters
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+        } catch (error) {
+          console.error("Error parsing user data from localStorage:", error);
+          localStorage.removeItem("user"); // Clear invalid data
+        }
+      }
+    }
+  }, [email, fullname, secret]); // Add dependencies to ensure effect runs when params change
 
-  React.useEffect(() => {
-    gapi.load('client:auth2', () => {
-      gapi.auth2.init({
-        client_id: clientId
-      });
-    });
-  }, []);
-
-  const responseGoogle = async (e) => {
-    // e.preventDefault()
-    dispatch(handleGoogleLogin(response));
-    console.log("responseGoogl", response)
+  // Handle Google login form submission
+  const handleGoogleLogin = (e) => {
+    // No need to prevent default as we want the form to submit to the Google auth endpoint
   };
 
   return (
-    <GoogleLogin
-      clientId={clientId}
-      buttonText="Login with Google"
-      onSuccess={responseGoogle}
-      onFailure={responseGoogle}
-      cookiePolicy={'single_host_origin'}
-    />
+    <>
+      {!user && (
+        <form action="http://localhost:4000/api/auth/google" method="GET" onSubmit={handleGoogleLogin}>
+          <button type="submit">Sign in with Google</button>
+        </form>
+      )}
+      {user && (
+        <div>
+          <p>Logged in as: {user.email}</p>
+        </div>
+      )}
+    </>
   );
 };
 

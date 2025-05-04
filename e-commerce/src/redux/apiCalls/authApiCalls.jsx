@@ -4,34 +4,24 @@ import { toast } from "react-toastify";
 import { GoogleLogout } from 'react-google-login';
 import { gapi } from 'gapi-script';
 
-export function loginUser(user, isGoogleLogin = false) {
+export function loginUser(user) {
   return async (dispatch) => {
-    try {
-      if (isGoogleLogin) {
-        // Handle Google login
-        // const { data } = await request.post('/api/auth/login', user);
-        dispatch(authActions.Login(user));
-        localStorage.setItem('userInfo', JSON.stringify(user));
-        // window.location.reload();
-        console.log("🚀 ~ loginUser ~ data:", user)
-      } else {
-        // Handle manual login
-        const { data } = await request.post('/api/auth/login', user);
-        dispatch(authActions.Login(data));
+    try{
+        const {data} = await request.post('/api/auth/login', user); 
+        dispatch(authActions.Login(data))
         localStorage.setItem('userInfo', JSON.stringify(data));
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error(error.response?.data?.message || "Login failed");
+    }catch(error){
+        console.log(error)
+        toast.error(error.response.data.message);
     }
-  };
+
+}
 }
 
 export function handleGoogleLogin(user) {
-  console.log("🚀 ~ handleGoogleLogin ~ user:", user)
   return async (dispatch) => {
     try {
-      const { data } = await request.post('/api/auth/google-login', user);
+      const { data } = await request.post('/api/auth/google', user);
       dispatch(authActions.Login(data.message))
     } catch (error) {
       console.log(error)

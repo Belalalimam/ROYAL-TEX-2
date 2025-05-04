@@ -2,7 +2,7 @@ const {body} = require('express-validator')
 
 const validationSchema = () => {
     return[
-        body("name")
+        body("fullname")
       .notEmpty()
       .withMessage("error")
       .isLength({ min: 2 })

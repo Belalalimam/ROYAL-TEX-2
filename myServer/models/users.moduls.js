@@ -7,7 +7,7 @@ const passwordComplexity = require("joi-password-complexity");
 
 const UserSchema = new mongoose.Schema(
   {
-    name: {
+    fullname: {
       type: String,
       required: true,
       trim: true,
@@ -29,13 +29,21 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       minlength: 8,
     },
-    // productImage: {
-    //   type: Object,
-    //   default: {
-    //     url: "",
-    //     publicId: null,
-    //   },
-    // },
+    pic: {
+      type: Object,
+      default: {
+        url: "",
+        publicId: null,
+      },
+    },
+    googleId: {
+      type: String,
+      default: null,
+    },
+    secret: {
+      type: String,
+      default: null,
+    },
     token: {
       type: String,
     },
@@ -74,7 +82,7 @@ const Users = mongoose.model("Users", UserSchema);
 // Validate Register User
 function validateRegisterUser(obj) {
   const schema = Joi.object({
-    name: Joi.string().trim().min(2).max(100).required(),
+    fullname: Joi.string().trim().min(2).max(100).required(),
     email: Joi.string().trim().min(5).max(100).required().email(),
     password: passwordComplexity().required(),
   });
@@ -93,7 +101,7 @@ function validateLoginUser(obj) {
 // Validate Update User
 function validateUpdateUser(obj) {
   const schema = Joi.object({
-    name: Joi.string().trim().min(2).max(100),
+    fullname: Joi.string().trim().min(2).max(100),
     password: passwordComplexity(),
     bio: Joi.string(),
   });

@@ -1,13 +1,8 @@
 const express = require("express");
 const UsersController = require("../controllers/users.contorller")
-const {
-  verifyTokenAndAdmin,
-  verifyTokenAndOnlyUser,
-  verifyToken,
-  verifyTokenAndAuthorization,
-} = require("../middlewares/verifyToken");
+const {verifyTokenAndAdmin,verifyTokenAndOnlyUser,verifyToken,verifyTokenAndAuthorization} = require("../middlewares/verifyToken");
 const validateObjectId = require("../middlewares/validateObjectId");
-
+const passport = require("passport");
 
 const router = express.Router();
 
