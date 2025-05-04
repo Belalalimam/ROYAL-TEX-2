@@ -6,21 +6,12 @@ import { useDispatch } from 'react-redux';
 import { loginUser,handleGoogleLogin } from '../../../redux/apiCalls/authApiCalls'
 import GoogleLogin from 'react-google-login';
 import { gapi } from 'gapi-script';
+import GoogleLoginButton from './googleLoginButton';
 
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const dispatch = useDispatch();
-
-  const clientId = '1033354121282-u5gtukmv264p62cb925373op610hccq3.apps.googleusercontent.com'
-
-  useEffect(() => {
-    gapi.load('client:auth2', () => {
-      gapi.auth2.init({
-        client_id: clientId
-      });
-    });
-  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -33,12 +24,6 @@ const Login = () => {
     e.preventDefault();
     dispatch(loginUser(formData));
   };
-
-  const responseGoogle = (response) => {
-    dispatch(handleGoogleLogin(response));
-    console.log("🚀 ~ responseGoogle ~ response:", response)
-  };
-
 
   return (
     <Box
@@ -82,13 +67,7 @@ const Login = () => {
           </Button>
           
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
-            <GoogleLogin
-              clientId= {clientId}
-              buttonText="Login with Google"
-              onSuccess={responseGoogle}
-              onFailure={responseGoogle}
-              cookiePolicy={'single_host_origin'}
-            />
+            <GoogleLoginButton />
           </Box>
 
 

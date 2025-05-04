@@ -136,60 +136,32 @@ const loginUserCtrl = asyncWrapper(async (req, res) => {
  * @access  public
  ------------------------------------------------*/
  const googleLoginUserCtrl = asyncWrapper(async (req, res) => {
-   try {
-     if (!req.body.token) {
-       return res.status(400).json({ error: 'Token is required' });
-      }
-      
-      const verificationResponse = await verifyGoogleToken(req.body.token);
-      console.log("🚀 ~ googleLoginUserCtrl ~ verificationResponse:", verificationResponse)
-     if (verificationResponse.error) {
-       return res.status(400).json(verificationResponse);
-      }
-      
-      const profile = verificationResponse.payload;
-      console.log("🚀 ~ googleLoginUserCtrl ~ profile:", profile)
-     
-     let user = await Users.findOne({ googleId: profile.sub });
-     
-     if (!user) {
-       user = new Users({
-         googleId: profile.sub,
-         email: profile.email,
-         name: profile.name,
-         avatar: profile.picture,
-         authMethod: 'google'
-       });
-       await user.save();
-     }
+  const { error } = validateRegisterUser(req.body);
+  if (error) {
+    console.log("🚀 ~ googleLoginUserCtrl ~ error:", error)
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  let user = await Users.findOne({ email: req.body.email }); 
+  if (user) {
+    return res.status(400).json({ message: "user already exist" });
+  }
+
+
+  user = new Users({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password
+  });
+  await user.save();
+  console.log("🚀 ~ googleLoginUserCtrl ~ user:", user)
+
+
+  res.status(201).json({
+    message: "We sent to you an email, please verify your email address",
+  });
+});
  
-     const token = jwt.sign(
-       { userId: user._id },
-       process.env.JWT_SECRET,
-       { expiresIn: '1d' }
-     );
- 
-     res.cookie('token', token, {
-       httpOnly: true,
-       secure: process.env.NODE_ENV === 'production',
-       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-       maxAge: 24 * 60 * 60 * 1000 // 1 day
-     });
- 
-     res.status(200).json({
-       success: true,
-       user: {
-         _id: user._id,
-         name: user.name,
-         email: user.email,
-         avatar: user.avatar
-       }
-     });
-   } catch (error) {
-     console.error('Google auth error:', error);
-     res.status(500).json({ error: 'Internal server error' });
-   }
- });
 
 /**-----------------------------------------------
  * @desc    Verify User Account

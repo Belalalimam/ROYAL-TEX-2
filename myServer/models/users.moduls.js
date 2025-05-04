@@ -7,10 +7,6 @@ const passwordComplexity = require("joi-password-complexity");
 
 const UserSchema = new mongoose.Schema(
   {
-    googleId: {
-      type: String,
-      unique: true
-    },
     name: {
       type: String,
       required: true,
@@ -22,7 +18,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      minlength: 5,
+      minlength: 5, 
       maxlength: 100,
       lowercase: true,
       unique: true,
@@ -33,13 +29,13 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       minlength: 8,
     },
-    productImage: {
-      type: Object,
-      default: {
-        url: "",
-        publicId: null,
-      },
-    },
+    // productImage: {
+    //   type: Object,
+    //   default: {
+    //     url: "",
+    //     publicId: null,
+    //   },
+    // },
     token: {
       type: String,
     },
@@ -61,7 +57,7 @@ const UserSchema = new mongoose.Schema(
 
 UserSchema.virtual("likes", {
   ref: "Products",
-  foreignField: "likes",
+  foreignField: "likes", 
   localField: "_id",
 });
 

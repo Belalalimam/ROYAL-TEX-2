@@ -27,30 +27,20 @@ export function loginUser(user, isGoogleLogin = false) {
   };
 }
 
-export function handleGoogleLogin(response) {
-  console.log("🚀 ~ handleGoogleLogin ~ response:", response)
-  return (dispatch) => {
+export function handleGoogleLogin(user) {
+  console.log("🚀 ~ handleGoogleLogin ~ user:", user)
+  return async (dispatch) => {
     try {
-      if (response?.profileObj) {
-        const data = {
-          _id: response.profileObj.googleId,
-          name: response.profileObj.name,
-          email: response.profileObj.email,
-          token: response.tokenId,
-          imageUrl: response.profileObj.imageUrl,
-          isAdmin: false, // Default value, adjust as needed
-        };
-
-        dispatch(loginUser(data, true));
-      } else {
-        toast.error("Google login failed");
-      }
+      const { data } = await request.post('/api/auth/google-login', user);
+      dispatch(authActions.Login(data.message))
     } catch (error) {
-      console.log(error);
-      toast.error("Google login failed");
+      console.log(error)
+      toast.error(error.response.data.message);
     }
-  };
+
+  }
 }
+
 
 export const logoutUser = () => async (dispatch) => {
   try {
