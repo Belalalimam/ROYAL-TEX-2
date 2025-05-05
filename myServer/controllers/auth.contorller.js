@@ -219,11 +219,19 @@ const verifyUserAccountCtrl = asyncWrapper(async (req, res) => {
  * @route   /api/auth/google/callback
  ------------------------------------------------*/
  const googleCallbackCtrl = asyncWrapper(async (req, res) => {
-  console.log(req);
-  res.redirect(
-    // `http://localhost:4000?email=${req.user.email}&fullname=${req.user.fullname}&secret=${req.user.secret}`
-    `http://localhost:5173?email=${req.user.email}&fullname=${req.user.fullname}&secret=${req.user.secret}`
-  );
+  try {
+    if (!req.user) {
+      throw new Error("No user object found");
+    }
+    
+    const redirectUrl = `http://localhost:5173/login?email=${encodeURIComponent(req.user.email)}&fullname=${encodeURIComponent(req.user.fullname)}&secret=${encodeURIComponent(req.user.secret)}&pic=${encodeURIComponent(req.user.pic)}`;
+    
+    console.log("Redirecting to:", redirectUrl);
+    res.redirect(redirectUrl);
+  } catch (error) {
+    console.error("Redirect error:", error);
+    res.redirect("http://localhost:5173/login?error=auth_failed");
+  }
 });
 
 module.exports = {

@@ -202,7 +202,7 @@ const Header = ({ onWishlistClick, wishlistItems }) => {
                     {user ? (
                       <Avatar
                         alt={user.name}
-                        src={userInfo.imageUrl || '/default-avatar.png'}
+                        src={userInfo.pic || '/default-avatar.png'}
                       />
                     ) : (
                       <FaUser />
@@ -252,7 +252,7 @@ const Header = ({ onWishlistClick, wishlistItems }) => {
               </Box>
 
 
-              <span className="desktop-only">{user?.name || 'Account'}</span>
+              <span className="desktop-only">{user?.fullname || 'Account'}</span>
 
             </div>
           </div>
