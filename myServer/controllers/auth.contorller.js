@@ -231,7 +231,7 @@ const verifyUserAccountCtrl = asyncWrapper(async (req, res) => {
     const token = user.token;
     
     // Use environment variables for base URLs
-    const clientBaseUrl = process.env.CLIENT_BASE_URL || "http://localhost:5173";
+    const clientBaseUrl = process.env.CLIENT_BASE_URL || "https://royal-tex.shutterfly-alu.com";
     
     // Redirect with user information and token
     const redirectUrl = `${clientBaseUrl}/login?` + 
@@ -244,7 +244,7 @@ const verifyUserAccountCtrl = asyncWrapper(async (req, res) => {
     res.redirect(redirectUrl);
   } catch (error) {
     console.error("Google callback error:", error);
-    const clientBaseUrl = process.env.CLIENT_BASE_URL || "http://localhost:5173";
+    const clientBaseUrl = process.env.CLIENT_BASE_URL || "https://royal-tex.shutterfly-alu.com";
     res.redirect(`${clientBaseUrl}/login?error=${encodeURIComponent(error.message || 'auth_failed')}`);
   }
 });

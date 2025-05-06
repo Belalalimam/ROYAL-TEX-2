@@ -30,7 +30,8 @@ mongoose.connect(url).then(() => console.log("connected to database"));
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  // origin: "http://localhost:5173",
+  origin: "https://royal-tex.shutterfly-alu.com",
   credentials: true
 }));
 
@@ -77,9 +78,9 @@ app.use((error, req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  // res.header('Access-Control-Allow-Origin', 'https://royal-tex.shutterfly-alu.com');
+  res.header('Access-Control-Allow-Origin', 'https://royal-tex.shutterfly-alu.com');
   // res.header('Access-Control-Allow-Origin', 'https://royal-tex.surge.sh');
-  res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+  // res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
