@@ -23,14 +23,14 @@ const {
 });
 
 /**-----------------------------------------------
- * @desc    Get User Profile
+ * @desc    Get User Profile  
  * @route   /api/users/Profile/:id
  * @method  GET
  * @access  public
  ------------------------------------------------*/
  const Profile = asyncWrapper(async (req, res) => {
   const user = await Users.findById(req.params.id)
-   .select("-password").populate("likes").populate("name");
+   .select("-password").populate("likes").populate("fullname");
 
   if (!user) {
     return res.status(404).json({ message: "user not found" });

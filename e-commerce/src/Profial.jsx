@@ -31,21 +31,17 @@ import { getUserProfile } from './redux/apiCalls/profileApiCalls'
 
 const UserDashboard = () => {
   const theme = useTheme();
-  const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const { like } = useSelector((state) => state.like);
   const { item = { items: [] } } = useSelector(state => state.cart) || {};
   const cart = item?.items || [];
-
-  
-
   const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     setLoading(false);
-    dispatch(getUserProfile(id))
-  }, [id]);
+    dispatch(getUserProfile(user._id))
+  }, [user._id]);
 
 
 
@@ -115,7 +111,7 @@ const UserDashboard = () => {
           fontWeight: 'bold',
           textAlign: 'center'
         }}>
-          Welcome back, {user?.name || 'User'}
+          Welcome back, {user?.fullname || 'User'}
         </Typography>
 
         <Grid container spacing={3}>

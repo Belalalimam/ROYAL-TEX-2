@@ -5,6 +5,7 @@ import { GoogleLogout } from 'react-google-login';
 import { gapi } from 'gapi-script';
 
 export function loginUser(user) {
+  console.log("🚀 ~ loginUser ~ user:", user)
   return async (dispatch) => {
     try{
         const {data} = await request.post('/api/auth/login', user); 
@@ -19,6 +20,7 @@ export function loginUser(user) {
 }
 
 export function handleGoogleLogin(user) {
+  console.log("🚀 ~ handleGoogleLogin ~ user:", user)
   return async (dispatch) => {
     try {
       const { data } = await request.post('/api/auth/google', user);

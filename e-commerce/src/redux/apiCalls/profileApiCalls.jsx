@@ -2,6 +2,7 @@ import { profileActions } from "../slices/profileSlic";
 import request from "../../utils/request";
 import { toast } from "react-toastify";
 
+
 export function getUserProfile(userId) {
     return async (dispatch) => {
         try{

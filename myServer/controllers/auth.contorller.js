@@ -19,6 +19,8 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
  * @access  public
  ------------------------------------------------*/
 const registerUserCtrl = asyncWrapper(async (req, res) => {
+console.log("🚀 ~ registerUserCtrl ~ req:", req.user)
+
   const { error } = validateRegisterUser(req.body);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
@@ -224,15 +226,31 @@ const verifyUserAccountCtrl = asyncWrapper(async (req, res) => {
       throw new Error("No user object found");
     }
     
-    const redirectUrl = `http://localhost:5173/login?email=${encodeURIComponent(req.user.email)}&fullname=${encodeURIComponent(req.user.fullname)}&secret=${encodeURIComponent(req.user.secret)}&pic=${encodeURIComponent(req.user.pic)}`;
+    const user = req.user;
+    // The token is already generated in passport.js and attached to the user object
+    const token = user.token;
     
-    console.log("Redirecting to:", redirectUrl);
+    // Use environment variables for base URLs
+    const clientBaseUrl = process.env.CLIENT_BASE_URL || "http://localhost:5173";
+    
+    // Redirect with user information and token
+    const redirectUrl = `${clientBaseUrl}/login?` + 
+      `email=${encodeURIComponent(user.email)}` +
+      `&fullname=${encodeURIComponent(user.fullname)}` +
+      `&token=${encodeURIComponent(token)}` +
+      `&_id=${encodeURIComponent(user._id)}` +
+      `&pic=${encodeURIComponent(user.pic || '')}`;
+    
     res.redirect(redirectUrl);
   } catch (error) {
-    console.error("Redirect error:", error);
-    res.redirect("http://localhost:5173/login?error=auth_failed");
+    console.error("Google callback error:", error);
+    const clientBaseUrl = process.env.CLIENT_BASE_URL || "http://localhost:5173";
+    res.redirect(`${clientBaseUrl}/login?error=${encodeURIComponent(error.message || 'auth_failed')}`);
   }
 });
+
+
+
 
 module.exports = {
   registerUserCtrl,

@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Paper, Typography, Box } from '@mui/material';
+import { TextField, Button, Paper, Typography, Box, Divider } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom'
-import swal from "sweetalert";
 import { useSelector, useDispatch } from "react-redux";
 import { registerUser } from '../../../redux/apiCalls/authApiCalls';
-import GoogleLogin from 'react-google-login';
-import { gapi } from 'gapi-script';
-import { Helmet } from 'react-helmet';
+import GoogleLoginButton from '../googleLoginButton';
+import swal from "sweetalert";
 
 
 const Register = () => {
@@ -23,8 +21,8 @@ const Register = () => {
       [e.target.name]: e.target.value
     });
   };
-  
-  
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,7 +33,7 @@ const Register = () => {
 
   if (registerMessage) {
     swal({
-      title: registerMessage, 
+      title: registerMessage,
       icon: "success"
     }).then(isOk => {
       if (isOk) {
@@ -58,7 +56,7 @@ const Register = () => {
           Register
         </Typography>
         <form onSubmit={handleSubmit}>
-        <TextField
+          <TextField
             fullWidth
             label="Full Name"
             name="fullname" // Added the name attribute
@@ -84,6 +82,9 @@ const Register = () => {
             value={formData.password}
             onChange={handleChange}
           />
+          <Divider>Or</Divider>
+
+          <GoogleLoginButton prop='Sing up' />
           <Button
             type="submit"
             fullWidth
@@ -105,15 +106,6 @@ const Register = () => {
           </Typography>
         </form>
       </Paper>
-      <Helmet>
-        <script
-          src="https://accounts.google.com/gsi/client"
-          async
-          defer
-          onLoad={() => console.log('Google Identity Services script loaded successfully')}
-          onError={() => console.error('Failed to load Google Identity Services script')}
-        />
-      </Helmet>
     </Box>
   );
 };
