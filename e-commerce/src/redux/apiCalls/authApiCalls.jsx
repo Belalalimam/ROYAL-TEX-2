@@ -24,7 +24,7 @@ export function handleGoogleLogin(user) {
   return async (dispatch) => {
     try {
       const { data } = await request.post('/api/auth/google', user);
-      dispatch(authActions.Login(data.message))
+      dispatch(authActions.Login(data))
     } catch (error) {
       console.log(error)
       toast.error(error.response.data.message);
