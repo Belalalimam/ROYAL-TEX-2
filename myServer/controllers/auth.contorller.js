@@ -151,7 +151,7 @@ const googleLoginUserCtrl = (passport) => {
        {
          clientID: process.env.GOOGLE_CLIENT_ID,
          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-         callbackURL: "http://localhost:4000/api/auth/google/callback",
+         callbackURL: "https://myserver-app.up.railway.app/api/auth/google/callback",
        },
        function (accessToken, refreshToken, profile, cb) {
          console.log(profile);

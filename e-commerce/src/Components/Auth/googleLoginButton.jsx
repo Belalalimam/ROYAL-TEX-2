@@ -148,7 +148,7 @@ function GoogleLoginButton({prop}) {
   }, [searchParams, navigate]);
 
   const handleGoogleLogin = () => {
-    window.location.href = "https://royal-tex.shutterfly-alu.com/api/auth/google";
+    window.location.href = "https://myserver-app.up.railway.app/api/auth/google";
   };
 
   if (loading) {
