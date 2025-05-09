@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Box, Alert, AlertTitle, Paper, Container, CircularProgress, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { useDispatch } from 'react-redux';
+import { loginUser } from '../../redux/apiCalls/authApiCalls'
 
 // Custom styled Google button
 const GoogleButton = styled('button')(({ theme }) => ({
@@ -91,6 +93,7 @@ const ButtonText = styled(Typography)({
 });
 
 function GoogleLoginButton({prop}) {
+   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const [userinfo, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -110,9 +113,11 @@ function GoogleLoginButton({prop}) {
       const email = searchParams.get("email");
       const fullname = searchParams.get("fullname");
       const token = searchParams.get("token");
+      const _id = searchParams.get("_id");
+      const isAdmin = searchParams.get("isAdmin");
       const pic = searchParams.get("pic");
 
-      console.log('URL Parameters:', { email, fullname, token, pic });
+      console.log('URL Parameters:', { email, fullname, token, _id, isAdmin, pic });
 
       if (email && fullname && token) {
         console.log('Essential parameters present, creating user object');
@@ -120,6 +125,8 @@ function GoogleLoginButton({prop}) {
           email,
           fullname,
           token,
+          _id,
+          isAdmin,
           pic: pic || ''
         };
 
@@ -148,7 +155,7 @@ function GoogleLoginButton({prop}) {
   }, [searchParams, navigate]);
 
   const handleGoogleLogin = () => {
-    window.location.href = "https://myserver-app.up.railway.app/api/auth/google";
+    window.location.href = "http://localhost:4000/api/auth/google";
   };
 
   if (loading) {

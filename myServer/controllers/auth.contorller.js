@@ -49,7 +49,7 @@ console.log("🚀 ~ registerUserCtrl ~ req:", req.user)
   await verificationToken.save();
 
   // Making the link
-  const link = `https://royal-tex.shutterfly-alu.com/users/${user._id}/verify/${verificationToken.token}`;
+  const link = `http://localhost:4000/users/${user._id}/verify/${verificationToken.token}`;
 
   // Putting the link into an html template
   const htmlTemplate = `
@@ -107,7 +107,7 @@ const loginUserCtrl = asyncWrapper(async (req, res) => {
       await verificationToken.save();
     }
 
-    const link = `https://royal-tex.shutterfly-alu.com/users/${user._id}/verify/${verificationToken.token}`;
+    const link = `http://localhost:4000/users/${user._id}/verify/${verificationToken.token}`;
 
     const htmlTemplate = `
     <div>
@@ -151,7 +151,8 @@ const googleLoginUserCtrl = (passport) => {
        {
          clientID: process.env.GOOGLE_CLIENT_ID,
          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-         callbackURL: "https://myserver-app.up.railway.app/api/auth/google/callback",
+         callbackURL: "http://localhost:4000/api/auth/google/callback",
+        //  callbackURL: "https://myserver-app.up.railway.app/api/auth/google/callback",
        },
        function (accessToken, refreshToken, profile, cb) {
          console.log(profile);
@@ -231,7 +232,7 @@ const verifyUserAccountCtrl = asyncWrapper(async (req, res) => {
     const token = user.token;
     
     // Use environment variables for base URLs
-    const clientBaseUrl = process.env.CLIENT_BASE_URL || "https://royal-tex.shutterfly-alu.com";
+    const clientBaseUrl = process.env.CLIENT_BASE_URL || "http://localhost:5173";
     
     // Redirect with user information and token
     const redirectUrl = `${clientBaseUrl}/login?` + 
@@ -239,12 +240,13 @@ const verifyUserAccountCtrl = asyncWrapper(async (req, res) => {
       `&fullname=${encodeURIComponent(user.fullname)}` +
       `&token=${encodeURIComponent(token)}` +
       `&_id=${encodeURIComponent(user._id)}` +
+      `&isAdmin=${encodeURIComponent(user.isAdmin)}` +
       `&pic=${encodeURIComponent(user.pic || '')}`;
     
     res.redirect(redirectUrl);
   } catch (error) {
     console.error("Google callback error:", error);
-    const clientBaseUrl = process.env.CLIENT_BASE_URL || "https://royal-tex.shutterfly-alu.com";
+    const clientBaseUrl = process.env.CLIENT_BASE_URL || "http://localhost:5173";
     res.redirect(`${clientBaseUrl}/login?error=${encodeURIComponent(error.message || 'auth_failed')}`);
   }
 });
