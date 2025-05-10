@@ -9,6 +9,7 @@ import { putLikeForProduct, getUserProfileLike } from "../../redux/apiCalls/like
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useNavigate } from "react-router-dom";
 import CardProucts from '../4-Products/CardProduct'
+import Checkout from "./checkout/checkout";
 
 const CartModal = () => {
   const [quantity, setQuantity] = useState(1);
@@ -61,7 +62,8 @@ const CartModal = () => {
   return (
     <>
       <Container maxWidth='md' sx={{ mt: 4, px: { xs: 1, sm: 2, md: 3 } }}>
-        <Grid container spacing={{ xs: 1, sm: 2, md: 4 }}>
+        <Grid container className="flex jusustify-between gap-2 ">
+        <Grid xs={6} container spacing={{ xs: 1, sm: 2, md: 4 }}>
           {Array.isArray(cart) && cart.length > 0 ? (
             cartProducts?.map((product) => (
               <Grid key={product._id} xs={12}>
@@ -157,6 +159,10 @@ const CartModal = () => {
               )}
             </Typography>
           )}
+        </Grid>
+        <Grid xs={6}>
+          <Checkout />
+        </Grid>
         </Grid>
       </Container>
 
