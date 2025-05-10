@@ -1,157 +1,220 @@
-import React from "react";
-import PropTypes from "prop-types";
-import withStyles from "@material-ui/core/styles/withStyles";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Paper from "@material-ui/core/Paper";
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import AddressForm from "./AddressForm";
-import PaymentForm from "./PaymentForm";
-import Review from "./review";
+import React, { useState } from 'react';
+import {
+  Container,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Box,
+  Divider,
+  TextField,
+  Paper,
+  Stepper,
+  Step,
+  StepLabel,
+  CircularProgress,
+  Snackbar,
+  Alert
+} from "@mui/material";
+import Grid from "@mui/material/Grid";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import PhoneIcon from '@mui/icons-material/Phone';
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 
-const styles = theme => ({
-  appBar: {
-    position: "relative"
-  },
-  layout: {
-    width: "auto",
-    marginLeft: theme.spacing.unit * 2,
-    marginRight: theme.spacing.unit * 2,
-    [theme.breakpoints.up(600 + theme.spacing.unit * 2 * 2)]: {
-      width: 600,
-      marginLeft: "auto",
-      marginRight: "auto"
+export default function Checkout() {
+  const [activeStep, setActiveStep] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  const steps = ['Shipping Information', 'Review Order', 'Payment'];
+
+  const handleNext = () => {
+    if (activeStep === steps.length - 1) {
+      setLoading(true);
+      // Simulate API call
+      setTimeout(() => {
+        setLoading(false);
+        setSuccess(true);
+      }, 2000);
+    } else {
+      setActiveStep((prevStep) => prevStep + 1);
     }
-  },
-  paper: {
-    marginTop: theme.spacing.unit * 3,
-    marginBottom: theme.spacing.unit * 3,
-    padding: theme.spacing.unit * 2,
-    [theme.breakpoints.up(600 + theme.spacing.unit * 3 * 2)]: {
-      marginTop: theme.spacing.unit * 6,
-      marginBottom: theme.spacing.unit * 6,
-      padding: theme.spacing.unit * 3
-    }
-  },
-  stepper: {
-    padding: `${theme.spacing.unit * 3}px 0 ${theme.spacing.unit * 5}px`
-  },
-  buttons: {
-    display: "flex",
-    justifyContent: "flex-end"
-  },
-  button: {
-    marginTop: theme.spacing.unit * 3,
-    marginLeft: theme.spacing.unit
-  }
-});
-
-const steps = ["Shipping address", "Payment details", "Review your order"];
-
-function getStepContent(step) {
-  switch (step) {
-    case 0:
-      return <AddressForm />;
-    case 1:
-      return <PaymentForm />;
-    case 2:
-      return <Review />;
-    default:
-      throw new Error("Unknown step");
-  }
-}
-
-class Checkout extends React.Component {
-  state = {
-    activeStep: 0
   };
 
-  handleNext = () => {
-    this.setState(state => ({
-      activeStep: state.activeStep + 1
-    }));
+  const handleBack = () => {
+    setActiveStep((prevStep) => prevStep - 1);
   };
 
-  handleBack = () => {
-    this.setState(state => ({
-      activeStep: state.activeStep - 1
-    }));
+  const handleCloseSnackbar = () => {
+    setSuccess(false);
   };
 
-  handleReset = () => {
-    this.setState({
-      activeStep: 0
-    });
-  };
+  return (
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+        <Typography variant="h4" component="h1" gutterBottom align="center" fontWeight="bold" color="primary">
+          Checkout
+        </Typography>
 
-  render() {
-    const { classes } = this.props;
-    const { activeStep } = this.state;
-    console.log(activeStep);
-    return (
-      <React.Fragment>
-        <main className={classes.layout}>
-          <Paper className={classes.paper}>
-            <Typography component="h1" variant="h4" align="center">
-              Checkout
+        <Stepper activeStep={activeStep} sx={{ mb: 4, mt: 2 }}>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+
+        <Divider sx={{ mb: 4 }} />
+
+        {activeStep === 0 && (
+          <Box>
+            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+              <LocationOnIcon color="primary" sx={{ mr: 1 }} />
+              Shipping Details
             </Typography>
-            <Stepper activeStep={activeStep} className={classes.stepper}>
-              {steps.map(label => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-            <React.Fragment>
-              {activeStep === steps.length ? (
-                <React.Fragment>
-                  <Typography variant="h5" gutterBottom>
-                    Thank you for your order.
-                  </Typography>
-                  <Typography variant="subtitle1">
-                    Your order number is #2001539. We have emailed your order
-                    confirmation, and will send you an update when your order
-                    has shipped.
-                  </Typography>
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  {getStepContent(activeStep)}
-                  <div className={classes.buttons}>
-                    {activeStep !== 0 && (
-                      <Button
-                        onClick={this.handleBack}
-                        className={classes.button}
-                      >
-                        Back
-                      </Button>
-                    )}
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={this.handleNext}
-                      className={classes.button}
-                    >
-                      {activeStep === steps.length - 1 ? "Place order" : "Next"}
-                    </Button>
-                  </div>
-                </React.Fragment>
-              )}
-            </React.Fragment>
-          </Paper>
-        </main>
-      </React.Fragment>
-    );
-  }
+
+            <Grid container spacing={3}>
+              <Grid xs={12} sm={6}>
+                <TextField
+                  required
+                  fullWidth
+                  id="firstName"
+                  label="First Name"
+                  variant="outlined"
+                  margin="normal"
+                />
+              </Grid>
+
+              <Grid xs={12} sm={6}>
+                <TextField
+                  required
+                  fullWidth
+                  id="lastName"
+                  label="Last Name"
+                  variant="outlined"
+                  margin="normal"
+                />
+              </Grid>
+
+              <Grid xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="phone"
+                  label="Phone Number"
+                  variant="outlined"
+                  margin="normal"
+                  InputProps={{
+                    startAdornment: <PhoneIcon color="action" sx={{ mr: 1 }} />,
+                  }}
+                />
+              </Grid>
+
+              <Grid xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="address"
+                  label="Street Address"
+                  variant="outlined"
+                  margin="normal"
+                />
+              </Grid>
+
+              <Grid xs={12} sm={6}>
+                <TextField
+                  required
+                  fullWidth
+                  id="postalCode"
+                  label="Postal Code"
+                  variant="outlined"
+                  margin="normal"
+                />
+              </Grid>
+
+              <Grid xs={12} sm={6}>
+                <TextField
+                  required
+                  fullWidth
+                  id="city"
+                  label="City"
+                  variant="outlined"
+                  margin="normal"
+                />
+              </Grid>
+
+              <Grid xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="country"
+                  label="Country"
+                  variant="outlined"
+                  margin="normal"
+                />
+              </Grid>
+            </Grid>
+          </Box>
+        )}
+
+        {activeStep === 1 && (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Review Your Order
+            </Typography>
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="body1">Order summary would appear here</Typography>
+              </CardContent>
+            </Card>
+          </Box>
+        )}
+
+        {activeStep === 2 && (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Payment Method
+            </Typography>
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="body1">Payment options would appear here</Typography>
+              </CardContent>
+            </Card>
+          </Box>
+        )}
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+          <Button
+            variant="outlined"
+            disabled={activeStep === 0}
+            onClick={handleBack}
+          >
+            Back
+          </Button>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleNext}
+            endIcon={activeStep === steps.length - 1 ? <ShoppingCartCheckoutIcon /> : null}
+            disabled={loading}
+          >
+            {loading ? (
+              <CircularProgress size={24} />
+            ) : activeStep === steps.length - 1 ? (
+              'Place Order'
+            ) : (
+              'Continue'
+            )}
+          </Button>
+        </Box>
+      </Paper>
+
+      <Snackbar open={success} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+          Order placed successfully!
+        </Alert>
+      </Snackbar>
+    </Container>
+  );
 }
-
-Checkout.propTypes = {
-  classes: PropTypes.object.isRequired
-};
-
-export default withStyles(styles)(Checkout);
