@@ -50,7 +50,7 @@ export default function Checkout() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
+    <Container maxWidth="md" sx={{ py: 4 }} style={{widht:'100%'}} className='checkout'>
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
         <Typography variant="h4" component="h1" gutterBottom align="center" fontWeight="bold" color="primary">
           Checkout

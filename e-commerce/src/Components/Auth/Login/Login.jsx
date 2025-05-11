@@ -55,8 +55,7 @@ const Login = () => {
             onChange={handleChange}
 
           />
-          <Divider>Or</Divider>
-          <GoogleLoginButton prop='Sing in' />
+          
 
           <Button
             type="submit"
@@ -66,6 +65,9 @@ const Login = () => {
           >
             Sign In
           </Button>
+
+          <Divider>Or</Divider>
+          <GoogleLoginButton prop='Sing in' />
           <Typography align="center">
             Don't have an account?
             <Link to={"/register"}>

@@ -82,9 +82,7 @@ const Register = () => {
             value={formData.password}
             onChange={handleChange}
           />
-          <Divider>Or</Divider>
-
-          <GoogleLoginButton prop='Sing up' />
+          
           <Button
             type="submit"
             fullWidth
@@ -93,6 +91,10 @@ const Register = () => {
           >
             Sign Up
           </Button>
+
+          <Divider>Or</Divider>
+
+          <GoogleLoginButton prop='Sing up' />
           {errors.submit && (
             <Typography color="error" align="center">
               {errors.submit}
