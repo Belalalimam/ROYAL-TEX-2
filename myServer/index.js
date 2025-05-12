@@ -5,6 +5,7 @@ const routerProduct = require("./routes/product.route");
 const routerAuth = require("./routes/auth.route");
 const routeCategories = require("./routes/categoriseRoute")
 const routeCart = require("./routes/cart.router")
+const routeCheckout = require("./routes/checkout.routes")
 
 const httpStatusText = require("./utils/httpStatusText");
 const passportConfig = require("./config/passport");
@@ -62,6 +63,7 @@ app.use("/api/users", usersRouter);
 app.use("/products", routerProduct);
 app.use("/api/categories", routeCategories);
 app.use('/api/cart', routeCart);
+app.use('/api/checkout', routeCheckout);
 
 app.all("*", (req, res) => {
   return res

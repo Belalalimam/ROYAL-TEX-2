@@ -5,6 +5,7 @@ function verifyToken(req, res, next) {
   const authToken = req.headers.authorization;
   if (authToken) {
     const token = authToken.split(" ")[1];
+    console.log("🚀 ~ verifyToken ~ token:", token)
     try {
       const decodedPayload = jwt.verify(token, process.env.JWT_SECRET_KEY);
       req.user = decodedPayload;
