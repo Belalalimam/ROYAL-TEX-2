@@ -41,6 +41,7 @@ const {
     productCategory: req.body.productCategory,
     productCategorySize: req.body.productCategorySize,
     productColor: req.body.productColor,
+    productPrice: req.body.productPrice,
     user: req.user.id,
     productImage: {
       url: result.secure_url,
@@ -180,6 +181,7 @@ const updateProduct = asyncWrapper(async (req, res) => {
         productCategory: req.body.productCategory,
         productCategorySize: req.body.productCategorySize,
         productColor: req.body.productColor,
+        productPrice: req.body.productPrice,
       },
     },
     { new: true }

@@ -56,6 +56,7 @@ const Dashboard = () => {
     productCategory: "",
     productCategorySize: "",
     productColor: "",
+    productPrice: "",
     productImage: null,
   });
   const { loading, isProductCreated } = useSelector((state) => state.product);
@@ -80,6 +81,7 @@ const Dashboard = () => {
       productCategory: "",
       productImage: null,
       productCategorySize: "",
+      productPrice: "",
       productColor: "",
     });
 
@@ -104,6 +106,7 @@ const Dashboard = () => {
     productCategory: "",
     productCategorySize: "",
     productColor: "",
+    productPrice: "",
     productImage: null,
   });
   const handleEditOpen = (product) => {
@@ -114,6 +117,7 @@ const Dashboard = () => {
       productCategory: product.productCategory,
       productCategorySize: product.productCategorySize,
       productColor: product.productColor,
+      productPrice: product.productPrice,
     });
     setEditModalOpen(true);
   };
@@ -205,6 +209,7 @@ const Dashboard = () => {
               <TableCell>Category</TableCell>
               <TableCell>CategorySize</TableCell>
               <TableCell>Color</TableCell>
+              <TableCell>Price</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -228,6 +233,7 @@ const Dashboard = () => {
                 <TableCell>{product.productCategory}</TableCell>
                 <TableCell>{product.productCategorySize}</TableCell>
                 <TableCell>{product.productColor}</TableCell>
+                <TableCell>{product.productPrice}</TableCell>
                 <TableCell>
                   <Button
                     variant="contained"
@@ -351,6 +357,17 @@ const Dashboard = () => {
                       <MenuItem value="blue">Blue</MenuItem>
                     </Select>
                   </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    name="productPrice"
+                    label="Price"
+                    value={productData.productPrice}
+                    onChange={handleInputChange}
+                  />
                 </Grid>
 
                 <Grid item xs={12}>

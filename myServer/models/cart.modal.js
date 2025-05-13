@@ -13,6 +13,10 @@ const cartItemSchema = new mongoose.Schema({
     default: 1,
     min: 1,
   },
+  productPrice: {
+    type: Number,
+    required: true
+  }
 });
 
 const cartSchema = new mongoose.Schema(
@@ -38,12 +42,14 @@ function addToCartValidate(obj) {
   const schema = Joi.object({
     productId: Joi.string().required(),
     quantity: Joi.number().min(1).required(),
+    productPrice: Joi.number().required(),
   })
   return schema.validate(obj);
 }
 function updateCartValidate(obj) {
   const schema = Joi.object({
     quantity: Joi.number().min(1).required(),
+    productPrice: Joi.number().required(),
   })
   return schema.validate(obj);
 }

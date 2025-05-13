@@ -153,6 +153,7 @@ const CategoryModal = ({ product, open, onClose, handleCardClick }) => {
 // Main Component
 const FeaturedProducts = ({ name }) => {
   const [quantity] = useState(1);
+  const [productPrice] = useState(1);
   const dispatch = useDispatch();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -182,7 +183,7 @@ const FeaturedProducts = ({ name }) => {
     dispatch(putCartForProduct(productId, quantity));
     toast.success("Product added to cart!");
   };
-  const handleAddToFavorites = (e, productId) => {
+  const handleAddToFavorites = (e, productId, productPrice) => {
     e.stopPropagation();
 
     if (!user) {

@@ -24,6 +24,10 @@ const ProductSchema = new mongoose.Schema(
     productColor: {
       type: String,
     },
+    productPrice: {
+      type: Number,
+      require: true,
+    },
     productImage: {
       type: Object,
       default: {
@@ -60,6 +64,7 @@ function validateCreateProduct(obj) {
     productCategory: Joi.string().trim().required(),
     productCategorySize: Joi.string().trim().required(),
     productColor: Joi.string().trim().required(),
+    productPrice: Joi.number().required(),
   });
   return schema.validate(obj);
 }
@@ -74,6 +79,7 @@ function validateUpdateProduct(obj) {
     productCategorySize: Joi.string().trim().required(),
     productColor: Joi.string().trim().required(),
     productImage: Joi.string().trim(),
+    productPrice: Joi.number(),
   });
   return schema.validate(obj);
 }

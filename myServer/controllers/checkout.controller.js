@@ -1,16 +1,18 @@
-const Cart = require('../models/cart.modal');
+const {Carts} = require('../models/cart.modal');
 const Order = require('../models/order.modal');
-const Product = require('../models/product.moduls'); // Make sure to import this
+const {Products} = require('../models/product.moduls'); // Make sure to import this
 const Payment = require('../config/payment');
 
 // Checkout controller
 exports.processCheckout = async (req, res) => {
   try {
     const userId = req.user.id;
+    
     const { shippingAddress } = req.body;
     
     // 1. Get the user's cart
-    const cart = await Cart.findOne({ userId }).populate('items.productId');
+    const cart = await Carts.findOne({ userId }).populate('items.productId');
+
     
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ message: "Your cart is empty" });
@@ -19,27 +21,29 @@ exports.processCheckout = async (req, res) => {
     // 2. Validate items (check stock, prices, etc.)
     for (const item of cart.items) {
       const product = item.productId;
+      console.log("🚀 ~ exports.processCheckout= ~ item:", item)
+      
       
       // Check if product exists and is available
-      if (!product || !product.isAvailable) {
-        return res.status(400).json({ 
-          message: `Product ${product ? product.name : 'Unknown'} is no longer available` 
-        });
-      }
+      // if (!product || !product.isAvailable) {
+      //   return res.status(400).json({ 
+      //     message: `Product ${product ? product.productName : 'Unknown'} is no longer available` 
+      //   });
+      // }
       
       // Check if price has changed
-      if (product.price !== item.price) {
+      if (product.productPrice !== item.productPrice) {
         return res.status(400).json({ 
-          message: `Price for ${product.name} has changed. Please refresh your cart` 
+          message: `Price for ${product.productName} has changed. Please refresh your cart` 
         });
       }
       
       // Check stock
-      if (product.stock < item.quantity) {
-        return res.status(400).json({ 
-          message: `Not enough stock for ${product.name}. Only ${product.stock} available` 
-        });
-      }
+      // if (product.stock < item.quantity) {
+      //   return res.status(400).json({ 
+      //     message: `Not enough stock for ${product.name}. Only ${product.stock} available` 
+      //   });
+      // }
     }
     
     // 3. Create order
@@ -67,14 +71,14 @@ exports.processCheckout = async (req, res) => {
     
     // 6. Update product stock
     for (const item of cart.items) {
-      await Product.findByIdAndUpdate(
+      await Products.findByIdAndUpdate(
         item.productId._id,
         { $inc: { stock: -item.quantity } }
       );
     }
     
     // 7. Clear the cart
-    await Cart.findByIdAndUpdate(cart._id, { 
+    await Carts.findByIdAndUpdate(cart._id, { 
       $set: { items: [], totalAmount: 0 } 
     });
     

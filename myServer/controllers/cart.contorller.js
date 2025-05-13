@@ -17,6 +17,7 @@ const addToCart = asyncWrapper(async (req, res) => {
           {
             productId: req.params.productId,
             quantity: req.body.quantity,
+            productPrice: req.body.productPrice,
           },
         ],
       });
@@ -31,6 +32,7 @@ const addToCart = asyncWrapper(async (req, res) => {
         cart.items.push({
           productId: req.params.productId,
           quantity: req.body.quantity,
+          productPrice: req.body.productPrice,
         });
       }
     }
