@@ -12,7 +12,7 @@ exports.processCheckout = async (req, res) => {
     
     // 1. Get the user's cart
     const cart = await Carts.findOne({ userId }).populate('items.productId');
-
+console.log(cart)
     
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ message: "Your cart is empty" });

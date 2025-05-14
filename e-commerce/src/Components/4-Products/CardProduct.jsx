@@ -131,16 +131,16 @@ const CategoryModal = ({ product, open, onClose, handleCardClick }) => {
         </Box>
         <Box sx={{ width: { xs: '100%', sm: '50%' }, height: '100%' }} className="">
           <Typography variant="body2" sx={{ mb: 1, fontSize: { xs: '1.3rem', sm: '1.5rem' } }}>
-          <span style={{color:"#052659"}}>Description</span> : {product.productDescription}
+            <span style={{ color: "#052659" }}>Description</span> : {product.productDescription}
           </Typography>
           <Typography variant="body2" sx={{ mb: 1, fontSize: { xs: '1.3rem', sm: '1.5rem' } }}>
-            <span style={{color:"#052659"}}>Category</span> : {product.productCategory}
+            <span style={{ color: "#052659" }}>Category</span> : {product.productCategory}
           </Typography>
           <Typography variant="body2" sx={{ mb: 1, fontSize: { xs: '1.3rem', sm: '1.5rem' } }}>
-            <span style={{color:"#052659"}}>Color</span> : {product.productColor}
+            <span style={{ color: "#052659" }}>Color</span> : {product.productColor}
           </Typography>
           <Typography variant="body2" sx={{ mb: 1, fontSize: { xs: '1.3rem', sm: '1.5rem' } }}>
-            <span style={{color:"#052659"}}>Size</span> : {product.productCategorySize}
+            <span style={{ color: "#052659" }}>Size</span> : {product.productCategorySize}
           </Typography>
         </Box>
       </DialogContent>
@@ -174,16 +174,17 @@ const FeaturedProducts = ({ name }) => {
     // console.log("🚀 ~ FeaturedProducts ~ cart:", item[0]._id)
   }, [dispatch, id]);
 
-  const handleAddToCart = (e, productId) => {
+  const handleAddToCart = (e, product) => {
     e.stopPropagation();
     if (!user) {
       toast.error("Please login to add items to cart!");
       return;
     }
-    dispatch(putCartForProduct(productId, quantity));
+    dispatch(putCartForProduct(product._id, quantity, product.productPrice));
     toast.success("Product added to cart!");
   };
-  const handleAddToFavorites = (e, productId, productPrice) => {
+
+  const handleAddToFavorites = (e, productId) => {
     e.stopPropagation();
 
     if (!user) {
@@ -226,7 +227,7 @@ const FeaturedProducts = ({ name }) => {
                         <FavoriteIcon />
                       </IconButton>
                       <IconButton
-                        onClick={(e) => handleAddToCart(e, product._id)}
+                        onClick={(e) => handleAddToCart(e, product)}
                         sx={{
                           color: Array.isArray(cart) && cart.some(item => item._id === product._id) ? "#4CAF50" : "white",
                           backgroundColor: "rgba(255,255,255,0.2)",
@@ -236,6 +237,7 @@ const FeaturedProducts = ({ name }) => {
                       >
                         <ShoppingCartIcon />
                       </IconButton>
+
                     </ProductActions>
                   </ProductImage>
                   <CardContent sx={{ flexGrow: 1 }}>

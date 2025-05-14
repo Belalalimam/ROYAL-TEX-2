@@ -20,11 +20,15 @@ import Grid from "@mui/material/Grid";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
+import { useDispatch } from 'react-redux';
+import {checkoutCart} from '../../../redux/apiCalls/cartApiCalls';
 
 export default function Checkout() {
   const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const dispatch = useDispatch();
+  
 
   const steps = ['Shipping Information', 'Review Order', 'Payment'];
 
@@ -49,9 +53,13 @@ export default function Checkout() {
     setSuccess(false);
   };
 
+  const handlePlaceOrder = () => {
+    dispatch(checkoutCart())
+  };
+
   return (
     <Container maxWidth="md" sx={{ py: 4 }} style={{widht:'100%'}} className='checkout'>
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+      {/* <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
         <Typography variant="h4" component="h1" gutterBottom align="center" fontWeight="bold" color="primary">
           Checkout
         </Typography>
@@ -214,7 +222,8 @@ export default function Checkout() {
         <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
           Order placed successfully!
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
+      <Button onClick={handlePlaceOrder}>checkout</Button>
     </Container>
   );
 }

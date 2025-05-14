@@ -43,6 +43,8 @@ const CartModal = () => {
   const { product } = useSelector(state => state.product);
   const { item = { items: [] } } = useSelector(state => state.cart) || {};
 
+  // console.log(product);
+
   const cart = item?.items || [];
 
   const cartProducts = product?.filter(prod =>
@@ -78,7 +80,7 @@ const CartModal = () => {
     if (user) {
       setIsLoggedIn(true);
       dispatch(getUserProfileCart());
-      dispatch(getUserProfileLike());
+      dispatch(getUserProfileLike(user._id));
     }
   }, [user, dispatch]);
 

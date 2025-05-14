@@ -5,10 +5,11 @@ import { toast } from "react-toastify";
 // Get user cart items
 export function getUserProfileCart() {
     return async (dispatch, getState) => {
+        const state = getState();
         try {
             const { data } = await request.get(`/api/cart`, {
                 headers: {
-                    authorization: 'Bearer ' + getState().auth.user.token
+                    authorization: 'Bearer ' + state.auth.user.token
                 }
             });
             dispatch(cartActions.setCartItem(data));
@@ -19,11 +20,12 @@ export function getUserProfileCart() {
 }
 
 // Add cart item
-export function putCartForProduct(productId, quantity) {
+// Add cart item
+export function putCartForProduct(productId, quantity, productPrice) {
     return async (dispatch, getState) => {
         try {
             const state = getState();
-            const { data } = await request.post(`/api/cart/${productId}`, {quantity}, {
+            const { data } = await request.post(`/api/cart/${productId}`, {quantity, productPrice}, {
                 headers: {
                     authorization: 'Bearer ' + state.auth.user.token
                 }
@@ -34,6 +36,7 @@ export function putCartForProduct(productId, quantity) {
         }
     }
 }
+
 
 
 // Remove cart item
@@ -51,5 +54,36 @@ export function deleteCartForProduct(productId) {
             toast.error(error.response.data.message);
         }
     }
+}
+
+
+
+// Checkout cart
+export function checkoutCart() {
+    return async (dispatch, getState) => {
+        try {
+            const state = getState();
+            const { data } = await request.post(`/api/checkout`, {},  {
+                headers: {
+                    authorization: 'Bearer ' + state.auth.user.token
+                }
+            });
+            
+            // Clear the cart after successful checkout
+            dispatch(cartActions.clearCart());
+            
+            // You might want to dispatch a success action or notification
+            return { success: true, order: data };
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Checkout failed. Please try again.");
+            console.log(error);
+            return { success: false, error: error.response?.data?.message || "Checkout failed" };
+        }
+    }
+}
+
+clearCart: (state) => {
+    state.item = null;
+    // or if you prefer: state.item = { items: [] };
 }
 
