@@ -1,6 +1,6 @@
 const {Carts} = require('../models/cart.modal');
 const Order = require('../models/order.modal');
-const {Products} = require('../models/product.modal'); // Make sure this import exists
+const { Products } = require('../models/product.moduls');
 const Payment = require('../services/payment.service');
 
 // Process checkout
@@ -21,25 +21,25 @@ exports.processCheckout = async (req, res) => {
       const product = item.productId;
       
       // Check if product exists and is available
-      if (!product || !product.isAvailable) {
-        return res.status(400).json({ 
-          message: `Product ${product ? product.name : 'Unknown'} is no longer available` 
-        });
-      }
+      // if (!product || !product.isAvailable) {
+      //   return res.status(400).json({ 
+      //     message: `Product ${product ? product.name : 'Unknown'} is no longer available` 
+      //   });
+      // }
       
       // Check if price has changed
-      if (product.price !== item.productPrice) {
+      if (product.productPrice !== item.productPrice) {
         return res.status(400).json({ 
-          message: `Price for ${product.name} has changed. Please refresh your cart` 
+          message: `Price for ${product.productName} has changed. Please refresh your cart` 
         });
       }
       
-      // Check stock
-      if (product.stock < item.quantity) {
-        return res.status(400).json({ 
-          message: `Not enough stock for ${product.name}. Only ${product.stock} available` 
-        });
-      }
+      // // Check stock
+      // if (product.stock < item.quantity) {
+      //   return res.status(400).json({ 
+      //     message: `Not enough stock for ${product.name}. Only ${product.stock} available` 
+      //   });
+      // }
     }
     
     // 3. Create order
@@ -66,19 +66,19 @@ exports.processCheckout = async (req, res) => {
       orderId: order._id
     });
     
-    if (paymentResult.success) {
+    if (paymentResult.success) { 
       // 5. Update order status
       order.paymentStatus = paymentMethodId === 'cash_on_delivery' ? 'pending' : 'paid';
       order.paymentDetails = paymentResult.details;
       await order.save();
       
       // 6. Update product stock
-      for (const item of cart.items) {
-        await Products.findByIdAndUpdate(
-          item.productId._id,
-          { $inc: { stock: -item.quantity } }
-        );
-      }
+      // for (const item of cart.items) {
+      //   await Products.findByIdAndUpdate(
+      //     item.productId._id,
+      //     { $inc: { stock: -item.quantity } }
+      //   );
+      // }
       
       // 7. Clear the cart
       await Carts.findByIdAndUpdate(cart._id, { 

@@ -30,7 +30,7 @@ const ProductSchema = new mongoose.Schema(
     },
     productImage: {
       type: Object,
-      default: {
+      default: { 
         url: "",
         publicId: null,
       },
