@@ -8,7 +8,10 @@ const cartSlice = createSlice({
     reducers: {
         setCartItem(state, action) {
             state.item = action.payload;
-        }
+        },
+        clearCart: (state) => {
+            state.item = null;
+          }
     }
 });
 const cartReducer = cartSlice.reducer;

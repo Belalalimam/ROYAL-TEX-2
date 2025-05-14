@@ -59,20 +59,19 @@ export function deleteCartForProduct(productId) {
 
 
 // Checkout cart
-export function checkoutCart() {
+export function checkoutCart(shippingAddress) {
     return async (dispatch, getState) => {
         try {
             const state = getState();
-            const { data } = await request.post(`/api/checkout`, {},  {
+            const { data } = await request.post(`/api/checkout`, {shippingAddress},  {
                 headers: {
                     authorization: 'Bearer ' + state.auth.user.token
                 }
             });
             
-            // Clear the cart after successful checkout
             dispatch(cartActions.clearCart());
             
-            // You might want to dispatch a success action or notification
+            toast.success("Checkout successful!");
             return { success: true, order: data };
         } catch (error) {
             toast.error(error.response?.data?.message || "Checkout failed. Please try again.");
@@ -82,8 +81,10 @@ export function checkoutCart() {
     }
 }
 
+
 clearCart: (state) => {
     state.item = null;
     // or if you prefer: state.item = { items: [] };
 }
+
 
