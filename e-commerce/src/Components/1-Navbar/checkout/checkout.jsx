@@ -20,38 +20,40 @@ import Grid from "@mui/material/Grid";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
+
+
 import { useDispatch } from 'react-redux';
 import {checkoutCart} from '../../../redux/apiCalls/cartApiCalls';
 
 export default function Checkout() {
-  const [activeStep, setActiveStep] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  // const [activeStep, setActiveStep] = useState(0);
+  // const [loading, setLoading] = useState(false);
+  // const [success, setSuccess] = useState(false);
   const dispatch = useDispatch();
   
 
-  const steps = ['Shipping Information', 'Review Order', 'Payment'];
+  // const steps = ['Shipping Information', 'Review Order', 'Payment'];
 
-  const handleNext = () => {
-    if (activeStep === steps.length - 1) {
-      setLoading(true);
-      // Simulate API call
-      setTimeout(() => {
-        setLoading(false);
-        setSuccess(true);
-      }, 2000);
-    } else {
-      setActiveStep((prevStep) => prevStep + 1);
-    }
-  };
+  // const handleNext = () => {
+  //   if (activeStep === steps.length - 1) {
+  //     setLoading(true);
+  //     // Simulate API call
+  //     setTimeout(() => {
+  //       setLoading(false);
+  //       setSuccess(true);
+  //     }, 2000);
+  //   } else {
+  //     setActiveStep((prevStep) => prevStep + 1);
+  //   }
+  // };
 
-  const handleBack = () => {
-    setActiveStep((prevStep) => prevStep - 1);
-  };
+  // const handleBack = () => {
+  //   setActiveStep((prevStep) => prevStep - 1);
+  // };
 
-  const handleCloseSnackbar = () => {
-    setSuccess(false);
-  };
+  // const handleCloseSnackbar = () => {
+  //   setSuccess(false);
+  // };
 
   const handlePlaceOrder = () => {
     dispatch(checkoutCart())

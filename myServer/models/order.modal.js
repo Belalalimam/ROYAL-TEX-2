@@ -78,11 +78,11 @@ function validateCreateOrder(obj) {
     shippingAddress: Joi.object({
       street: Joi.string().required(),
       city: Joi.string().required(),
-      state: Joi.string().required(),
+      state: Joi.string().required(), 
       country: Joi.string().required(),
       zipCode: Joi.string().required()
     }).required(),
-    paymentMethod: Joi.string().valid('cash_on_delivery', 'credit_card', 'paypal').default('cash_on_delivery')
+    paymentMethod: Joi.string().valid('cash_on_delivery', 'credit_card', 'paypal').default('cash_on_delivery').required()
   });
   return schema.validate(obj);
 }

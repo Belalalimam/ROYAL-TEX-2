@@ -20,7 +20,6 @@ export function getUserProfileCart() {
 }
 
 // Add cart item
-// Add cart item
 export function putCartForProduct(productId, quantity, productPrice) {
     return async (dispatch, getState) => {
         try {
@@ -55,8 +54,6 @@ export function deleteCartForProduct(productId) {
         }
     }
 }
-
-
 
 // Checkout cart
 export function checkoutCart(shippingAddress) {
