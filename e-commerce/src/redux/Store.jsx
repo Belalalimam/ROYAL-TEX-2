@@ -5,6 +5,7 @@ import { likeReducer } from "./slices/likeReducer";
 import { productReducer } from './slices/productSlice'
 import { categoryReducer } from "./slices/categoriesReducer";
 import { cartReducer } from "./slices/cartReducer";
+import { orderReducer } from "./slices/orderReducer";
 // import { passwordReducer } from "./slices/passwordSlice";
 
 const Store = configureStore({
@@ -15,6 +16,7 @@ const Store = configureStore({
         product: productReducer,
         cart: cartReducer,
         category: categoryReducer,
+        orders: orderReducer,
         //    password: passwordReducer, 
     }
 });
