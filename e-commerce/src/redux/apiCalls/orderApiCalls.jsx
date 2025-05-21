@@ -2,14 +2,18 @@ import { orderActions } from "../slices/orderReducer";
 import request from "../../utils/request";
 import { toast } from "react-toastify";
 
-export function getUserProfileLike(userId) {
-    return async (dispatch) => {
+export function getUserProfileOrder() {
+    return async (dispatch, getState) => {
         try{
-            const {data} = await request.get(`/api/users/Profile/${userId}`); 
-            dispatch(orderActions.setOrderItem(data))
-            // console.log("🚀 ~ return ~ data:", data.likes)
+            const state = getState();
+            const {data} = await request.get(`/api/checkout/user/orders`, {
+                headers: {
+                    authorization: 'Bearer ' + state.auth.user.token
+                }
+            }); 
+            dispatch(orderActions.setOrderItem(data.orders));
+            // toast.success("Order placed successfully!");
         }catch(error){
-            console.log(error)
             toast.error(error.response.data.message);
         }
 

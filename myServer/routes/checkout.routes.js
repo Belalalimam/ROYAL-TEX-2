@@ -9,5 +9,7 @@ router.post('/', verifyToken, checkoutController.processCheckout);
 // Get order details by ID
 router.get('/:orderId', verifyToken, checkoutController.getOrderDetails);
 
+router.get('/user/orders', verifyToken, checkoutController.getUserOrders);
+
 module.exports = router;
   

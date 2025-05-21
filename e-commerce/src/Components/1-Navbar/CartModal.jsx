@@ -42,7 +42,6 @@ const CartModal = () => {
   const { like } = useSelector(state => state.like);
   const { product } = useSelector(state => state.product);
   const { item = { items: [] } } = useSelector(state => state.cart) || {};
-
   // console.log(product);
 
   const cart = item?.items || [];
