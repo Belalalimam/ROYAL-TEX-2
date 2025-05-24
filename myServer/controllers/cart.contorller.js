@@ -12,7 +12,7 @@ const addToCart = asyncWrapper(async (req, res) => {
 
     if (!cart) {
       cart = new Carts({
-        userId: req.user.id,
+        userId: req.user.id, 
         items: [
           {
             productId: req.params.productId,
@@ -37,12 +37,15 @@ const addToCart = asyncWrapper(async (req, res) => {
       }
     }
 
+    // Calculate total before saving
+    cart.calculateTotal();
     await cart.save();
     res.status(200).json(cart);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 // الحصول على سلة المستخدم
 const getCart = asyncWrapper(async (req, res) => {

@@ -11,7 +11,7 @@ export function loginUser(user) {
         const {data} = await request.post('/api/auth/login', user); 
         dispatch(authActions.Login(data))
         localStorage.setItem('userInfo', JSON.stringify(data));
-    }catch(error){
+    }catch(error){ 
         console.log(error)
         toast.error(error.response.data.message);
     }

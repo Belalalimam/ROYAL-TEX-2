@@ -49,9 +49,8 @@ const UserDashboard = () => {
 
   const ii = recentOrders.item;
 
-  useEffect(() => {
-    console.log(ii);
-  }, []);
+  const orderCount = recentOrders.length;
+
 
 
 
@@ -60,7 +59,7 @@ const UserDashboard = () => {
 
 
   const userStats = [
-    { title: 'My Orders', value: cart?.length, icon: <ShoppingBag />, color: '#FF6B6B' },
+    { title: 'My Orders', value: orderCount > 0 ? orderCount : '0' , icon: <ShoppingBag />, color: '#FF6B6B' },
     { title: 'Wishlist', value: like?.length, icon: <Favorite />, color: '#4ECDC4' },
     { title: 'Reward Points', value: '2,456', icon: <Star />, color: '#FFD93D' },
     { title: 'Coupons', value: '6', icon: <LocalOffer />, color: '#6C5CE7' }
@@ -154,7 +153,7 @@ const UserDashboard = () => {
             </Grid>
           ))}
 
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={7}>
             <Paper sx={{
               p: 3,
               height: '400px',
@@ -206,7 +205,7 @@ const UserDashboard = () => {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          {/* <Grid item xs={12} md={4}>
             <Paper sx={{
               p: 3,
               height: '400px',
@@ -218,44 +217,133 @@ const UserDashboard = () => {
                 Recent Orders
               </Typography>
               <List>
-                <div className="user-profile">
-                  <h2>My Orders</h2>
+                {recentOrders.map((order) => (
+                  
+                  <ListItem
+                    key={order.id}
+                    sx={{
+                      mb: 2,
+                      bgcolor: '#fff',
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                    }}
+                  >
+                    <ListItemAvatar>
+                      <Avatar sx={{ bgcolor: '#6C5CE7' }}>
+                        <LocalShipping />
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={order.product}
+                      secondary={
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            {order.date}
+                          </Typography>
+                          <Chip
+                            label={order.status}
+                            size="small"
+                            sx={{
+                              bgcolor: getStatusColor(order.status),
+                              color: 'white'
+                            }}
+                          />
+                          <Chip
+                            label={order.paymentMethod}
+                            size="small"
+                            sx={{
+                              bgcolor: getStatusColor(order.paymentMethod),
+                              color: 'white'
+                            }}
+                          />
+                          <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#2C3E50' }}>
+                            {order.price}
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Paper>
+          </Grid> */}
 
-                  {recentOrders.length === 0 ? (
-                    <p>You haven't placed any orders yet.</p>
-                  ) : (
-                    <div className="orders-list">
-                      {recentOrders.map(order => (
-                        <div key={order._id} className="order-card">
-                          <div className="order-header">
-                            <h3>Order #{order._id.substring(0, 8)}</h3>
-                            <p>Date: {new Date(order.createdAt).toLocaleDateString()}</p>
-                            <p>Status: <span className={`status-${order.status}`}>{order.status}</span></p>
-                            <p>Total: ${order.totalAmount.toFixed(2)}</p>
-                          </div>
 
-                          <div className="order-items-preview">
-                            <h4>Items:</h4>
-                            <ul>
-                              {order.items.map((item, index) => (
-                                <li key={index}>
-                                  {item.name} x {item.quantity} - ${item.productPrice.toFixed(2)} each
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <Link to={`/orders/${order._id}`} className="view-details-btn">
-                            View Order Details
-                          </Link>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+          <Grid item xs={12} md={5}>
+            <Paper sx={{
+              p: 3,
+              height: '400px',
+              borderRadius: '16px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+              overflow: 'auto'
+            }}>
+              <Typography variant="h6" gutterBottom sx={{ color: '#2C3E50' }}>
+                Recent Orders
+              </Typography>
+              <List>
+                {recentOrders && recentOrders.length > 0 ? (
+                  recentOrders.map((order, index) => (
+                    <ListItem
+                      key={order._id || index}
+                      sx={{
+                        mb: 2,
+                        bgcolor: '#fff',
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                      }}
+                    >
+                      <ListItemAvatar>
+                        <Avatar sx={{ bgcolor: '#6C5CE7' }}>
+                          <LocalShipping />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={
+                          // If order has items array with populated products
+                          order.items && order.items.length > 0
+                            ? order.items.map(item =>
+                              item.name || item.productId?.title || 'Product'
+                            ).join(', ')
+                            : order.productName || order.product || 'Order Items'
+                        }
+                        secondary={
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              {new Date(order.createdAt || order.date).toLocaleDateString()}
+                            </Typography>
+                            <Chip
+                              label={order.status || 'Processing'}
+                              size="small"
+                              sx={{
+                                bgcolor: getStatusColor(order.status || 'Processing'),
+                                color: 'white'
+                              }}
+                            />
+                            <Chip
+                              label={order.paymentMethod || 'Card'}
+                              size="small"
+                              sx={{
+                                bgcolor: getStatusColor(order.paymentMethod || 'Card'),
+                                color: 'white'
+                              }}
+                            />
+                            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#2C3E50' }}>
+                              ${order.totalAmount || order.price || '0.00'}
+                            </Typography>
+                          </Box>
+                        }
+                      />
+                    </ListItem>
+                  ))
+                ) : (
+                  <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 2 }}>
+                    No recent orders found
+                  </Typography>
+                )}
               </List>
             </Paper>
           </Grid>
+
         </Grid>
       </Container>
     </Box>

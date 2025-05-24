@@ -56,11 +56,11 @@ export function deleteCartForProduct(productId) {
 }
 
 // Checkout cart
-export function checkoutCart(shippingAddress) {
+export function checkoutCart(shippingAddress, navigate) { 
     return async (dispatch, getState) => {
         try {
             const state = getState();
-            const { data } = await request.post(`/api/checkout`, {shippingAddress},  {
+            const { data } = await request.post(`/api/checkout`, shippingAddress,  {
                 headers: {
                     authorization: 'Bearer ' + state.auth.user.token
                 }
@@ -69,6 +69,9 @@ export function checkoutCart(shippingAddress) {
             dispatch(cartActions.clearCart());
             
             toast.success("Checkout successful!");
+            if (navigate) {
+                navigate('/profile/:id'); // or whatever your profile route is
+            }
             return { success: true, order: data };
         } catch (error) {
             toast.error(error.response?.data?.message || "Checkout failed. Please try again.");

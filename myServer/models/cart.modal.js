@@ -17,7 +17,7 @@ const cartItemSchema = new mongoose.Schema({
     type: Number,
     required: true
   }
-});
+}); 
 
 const cartSchema = new mongoose.Schema(
   {
@@ -34,9 +34,15 @@ const cartSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+cartSchema.methods.calculateTotal = function() {
+  this.totalAmount = this.items.reduce((total, item) => {
+    return total + (item.quantity * item.productPrice);
+  }, 0);
+  return this.totalAmount;
+};
+
 
 const Carts = mongoose.model("Carts", cartSchema);
-
 
 function addToCartValidate(obj) {
   const schema = Joi.object({
@@ -46,6 +52,7 @@ function addToCartValidate(obj) {
   })
   return schema.validate(obj);
 }
+
 function updateCartValidate(obj) {
   const schema = Joi.object({
     quantity: Joi.number().min(1).required(),

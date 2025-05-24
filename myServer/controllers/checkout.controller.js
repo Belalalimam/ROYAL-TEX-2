@@ -4,16 +4,14 @@ const { validateCreateOrder, validateUpdateOrder, validateOrderStatus } = requir
 const { Products } = require('../models/product.moduls');
 const Payment = require('../config/payment');
 
-// Process checkout
 exports.processCheckout = async (req, res) => {
   try {
     const userId = req.user.id;
     const {paymentMethodId =  'cash_on_delivery' , ...shippingAddress} = req.body;
 
     // 1. Get the user's cart
-    const cart = await Carts.findOne({ userId }).populate('items.productId');
+    const cart = await Carts.findOne({ userId }).populate('items.productId', 'name title price productName productPrice').exec(); 
     
-    console.log("🚀 ~ exports.processCheckout= ~ cart:", cart)
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ message: "Your cart is empty" });
     }
@@ -25,7 +23,7 @@ exports.processCheckout = async (req, res) => {
       
       return {
         productId: item.productId._id.toString(),
-        name: item.productId.productName || item.productId.name,
+        name: item.productId.productName || item.productId.name || item.productId.title,
         quantity: item.quantity,
         productPrice: item.productPrice
       };
@@ -33,12 +31,28 @@ exports.processCheckout = async (req, res) => {
     
     // 2. Validate items (check stock, prices, etc.)
     for (const item of cart.items) {
-      const product = item.productId;
+      console.log("🚀 ~ exports.processCheckout= ~ item:", item)
+      // Fetch the actual product from database to get current price
+      const actualProduct = await Products.findById(item.productId._id);
       
-      // Check if price has changed
-      if (product.productPrice !== item.productPrice) {
+      if (!actualProduct) {
         return res.status(400).json({ 
-          message: `Price for ${product.productName} has changed. Please refresh your cart` 
+          message: `Product ${item.productId.productName || item.productId.name || item.productId.title || 'not found'} is no longer available` 
+        });
+      }
+      
+      // Check if price has changed - compare with actual product price
+      const currentPrice = actualProduct.productPrice || actualProduct.price;
+      if (currentPrice !== item.productPrice) {
+        return res.status(400).json({ 
+          message: `Price for ${actualProduct.productName || actualProduct.name || actualProduct.title || 'this product'} has changed. Please refresh your cart` 
+        });
+      }
+
+      // Check stock availability
+      if (actualProduct.stock < item.quantity) {
+        return res.status(400).json({ 
+          message: `Insufficient stock for ${actualProduct.productName || actualProduct.name || actualProduct.title}. Available: ${actualProduct.stock}` 
         });
       }
     }
@@ -47,7 +61,7 @@ exports.processCheckout = async (req, res) => {
     const orderData = {
       items: cart.items.map(item => ({
         productId: item.productId._id.toString(),
-        name: item.productId.productName || item.productId.name,
+        name: item.productId.productName || item.productId.name || item.productId.title,
         quantity: item.quantity,
         productPrice: item.productPrice
       })),
@@ -234,7 +248,7 @@ exports.cancelOrder = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
     
-    // Ensure the order belongs to the requesting user
+    // Ensure the order belongs to the requesting user  
     if (order.userId.toString() !== userId) {
       return res.status(403).json({ message: "You don't have permission to cancel this order" });
     }

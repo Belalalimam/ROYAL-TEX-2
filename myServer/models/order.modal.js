@@ -30,11 +30,11 @@ const OrderSchema = new mongoose.Schema(
       required: true
     },
     shippingAddress: {
-      street: String,
+      firstName: String,
+      lastName: String,
       city: String,
-      state: String,
-      country: String,
-      zipCode: String
+      address: String,
+      phoneNumber: String
     },
     status: {
       type: String,
@@ -76,11 +76,11 @@ function validateCreateOrder(obj) {
     ).min(1).required(),
     totalAmount: Joi.number().min(0).required(),
     shippingAddress: Joi.object({
-      street: Joi.string().required(),
-      city: Joi.string().required(),
-      state: Joi.string().required(), 
-      country: Joi.string().required(),
-      zipCode: Joi.string().required()
+      firstName: Joi.string().required(),
+      lastName: Joi.string().required(),
+      city: Joi.string().required(), 
+      address: Joi.string().required(),
+      phoneNumber: Joi.string().required()
     }).required(),
     paymentMethod: Joi.string().valid('cash_on_delivery', 'credit_card', 'paypal').default('cash_on_delivery').required()
   });
