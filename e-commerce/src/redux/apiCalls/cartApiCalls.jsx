@@ -19,6 +19,34 @@ export function getUserProfileCart() {
     }
 }
 
+export const updateCartQuantity = (itemId, quantity) => {
+  return async (dispatch, getState) => {
+    try {
+      const { auth } = getState();
+      
+      // Make sure quantity is a number and greater than 0
+      const validQuantity = parseInt(quantity);
+      if (!validQuantity || validQuantity < 1) {
+        throw new Error("Quantity must be a positive number");
+      }
+
+      const response = await request.put(`/api/cart/${itemId}`, {
+        quantity: validQuantity
+      }, {
+        headers: {
+          Authorization: "Bearer " + auth.user.token,
+        },
+      });
+      
+      dispatch(cartActions.updateCart(response.data));
+      return response.data;
+    } catch (error) {
+      console.error("Error updating cart:", error);
+      throw error;
+    }
+  };
+};
+
 // Add cart item
 export function putCartForProduct(productId, quantity, productPrice) {
     return async (dispatch, getState) => {

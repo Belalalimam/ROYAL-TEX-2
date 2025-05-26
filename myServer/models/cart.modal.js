@@ -36,6 +36,10 @@ const cartSchema = new mongoose.Schema(
 );
 cartSchema.methods.calculateTotal = function() {
   this.totalAmount = this.items.reduce((total, item) => {
+    // Add null checks for item properties
+    if (!item || typeof item.quantity !== 'number' || typeof item.productPrice !== 'number') {
+      return total;
+    }
     return total + (item.quantity * item.productPrice);
   }, 0);
   return this.totalAmount;
@@ -56,7 +60,7 @@ function addToCartValidate(obj) {
 function updateCartValidate(obj) {
   const schema = Joi.object({
     quantity: Joi.number().min(1).required(),
-    productPrice: Joi.number().required(),
+    productPrice: Joi.number().optional(),
   })
   return schema.validate(obj);
 }

@@ -171,7 +171,6 @@ const FeaturedProducts = ({ name }) => {
       dispatch(getUserProfileCart(id));
     }
     dispatch(fetchProduct());
-    // console.log("🚀 ~ FeaturedProducts ~ cart:", item[0]._id)
   }, [dispatch, id]);
 
   const handleAddToCart = (e, product) => {
