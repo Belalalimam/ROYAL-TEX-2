@@ -14,7 +14,8 @@ import {
   Paper,
   useTheme,
   useMediaQuery,
-  IconButton
+  IconButton,
+  CircularProgress
 } from "@mui/material";
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -22,7 +23,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useSelector, useDispatch } from "react-redux";
-import { getUserProfileCart, putCartForProduct, deleteCartForProduct } from '../../redux/apiCalls/cartApiCalls';
+import { getUserProfileCart, updateCartQuantity, deleteCartForProduct } from '../../redux/apiCalls/cartApiCalls';
 import { putLikeForProduct, getUserProfileLike } from "../../redux/apiCalls/likeApiCalls";
 import { useNavigate } from "react-router-dom";
 import CardProucts from '../4-Products/CardProduct';
@@ -37,30 +38,99 @@ const CartModal = () => {
   const dispatch = useDispatch();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const { user } = useSelector((state) => state.auth);
   const { like } = useSelector(state => state.like);
   const { product } = useSelector(state => state.product);
-  const { item = { items: [] } } = useSelector(state => state.cart) || {};
-  // console.log(product);
+  const { item, loading: cartLoading, error } = useSelector(state => state.cart) || {};
 
-  const cart = item?.items || [];
+  // Fix cart data access - handle different possible structures
+  const cart = item?.items || item || [];
 
-  const cartProducts = product?.filter(prod =>
-    cart?.some(cartItem => cartItem.productId === prod._id)
-  );
+  // console.log("Cart data:", cart);
+  // console.log("Products data:", product);
+  // console.log("Full cart item:", item);
+
+  // Improved product filtering with better error handling
+  const cartProducts = React.useMemo(() => {
+    if (!product || !Array.isArray(product) || !cart || !Array.isArray(cart)) {
+      console.log("Missing data - product:", !!product, "cart:", !!cart);
+      return [];
+    }
+
+    const filtered = product.filter(prod => {
+      if (!prod || !prod._id) return false;
+
+      const isInCart = cart.some(cartItem => {
+        if (!cartItem || !cartItem.productId) return false;
+
+        // Handle both string and object productId
+        const productId = typeof cartItem.productId === 'object'
+          ? cartItem.productId._id || cartItem.productId.toString()
+          : cartItem.productId;
+
+        return productId === prod._id;
+      });
+
+      return isInCart;
+    });
+
+    console.log("Filtered cart products:", filtered);
+    return filtered;
+  }, [product, cart]);
 
   const handleRemoveFromCart = (productId) => {
     dispatch(deleteCartForProduct(productId));
   };
 
   const getQuantityForProduct = (productId) => {
-    const cartItem = cart?.find(item => item.productId === productId);
+    if (!cart || !Array.isArray(cart)) return 1;
+
+    const cartItem = cart.find(item => {
+      if (!item || !item.productId) return false;
+
+      // Handle both string and object productId
+      const itemProductId = typeof item.productId === 'object'
+        ? item.productId._id || item.productId.toString()
+        : item.productId;
+
+      return itemProductId === productId;
+    });
+
     return cartItem ? cartItem.quantity : 1;
   };
 
   const handleQuantityChange = (productId, newQuantity) => {
-    dispatch(putCartForProduct({ productId, quantity: newQuantity }));
+    const quantity = parseInt(newQuantity);
+    console.log("Changing quantity for product:", productId, "to:", quantity);
+
+    if (quantity <= 0 || isNaN(quantity)) {
+      console.error("Invalid quantity:", newQuantity);
+      return;
+    }
+
+    const cartItem = cart.find(item => {
+      const itemProductId = typeof item.productId === 'object'
+        ? item.productId._id || item.productId.toString()
+        : item.productId;
+      return itemProductId === productId;
+    });
+
+    if (!cartItem) {
+      console.error("Cart item not found for product:", productId);
+      return;
+    }
+
+    const itemId = cartItem._id;
+    console.log("Updating cart item:", itemId, "with quantity:", quantity);
+
+    dispatch(updateCartQuantity(itemId, quantity));
+    
+    
+    useEffect(() => {
+      Loading(true);
+    }, [dispatch]);
   };
 
   const toggleFavorite = (productId) => {
@@ -76,16 +146,61 @@ const CartModal = () => {
   };
 
   useEffect(() => {
-    if (user) {
-      setIsLoggedIn(true);
-      dispatch(getUserProfileCart());
-      dispatch(getUserProfileLike(user._id));
-    }
+    const fetchData = async () => {
+      if (user) {
+        setIsLoggedIn(true);
+        setLoading(true);
+        try {
+          await dispatch(getUserProfileCart());
+          await dispatch(getUserProfileLike(user._id));
+        } catch (error) {
+          console.error("Error fetching cart data:", error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [user, dispatch]);
+
+  // Show loading state
+  if (loading || cartLoading) {
+    return (
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '400px'
+      }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 4 }}>
+        <Typography color="error">
+          Error loading cart: {error}
+        </Typography>
+        <Button
+          variant="contained"
+          onClick={() => dispatch(getUserProfileCart())}
+          sx={{ mt: 2 }}
+        >
+          Retry
+        </Button>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ backgroundColor: theme.palette.background.default, py: 4 }}>
-      <Container maxWidth="xl" >
+      <Container maxWidth="xl">
         <Typography
           variant="h4"
           component="h1"
@@ -96,12 +211,12 @@ const CartModal = () => {
             textAlign: { xs: 'center', md: 'left' }
           }}
         >
-          Your Shopping Cart
+          Your Shopping Cart ({cart.length} items)
         </Typography>
 
-        {cart.length > 0 ? (
+        {cart.length > 0 && cartProducts.length > 0 ? (
           <Grid container spacing={3}>
-            <Grid item xs={12} md={7} className="">
+            <Grid item xs={12} md={7}>
               <Paper
                 elevation={2}
                 sx={{
@@ -110,7 +225,7 @@ const CartModal = () => {
                   overflow: 'hidden'
                 }}
               >
-                {cartProducts?.map((product, index) => (
+                {cartProducts.map((product, index) => (
                   <React.Fragment key={product._id}>
                     <Card
                       sx={{
@@ -134,7 +249,7 @@ const CartModal = () => {
                             transform: 'scale(1.05)'
                           }
                         }}
-                        image={product.productImage.url}
+                        image={product.productImage?.url || '/placeholder-image.jpg'}
                         alt={product.productName}
                         onClick={() => handleCardClick(product)}
                       />
@@ -232,8 +347,8 @@ const CartModal = () => {
               </Paper>
             </Grid>
 
-            <Grid item xs={12} md={5} className="">
-              <div style={{width:'100%'}} className="">
+            <Grid item xs={12} md={5}>
+              <div style={{ width: '100%' }}>
                 <Checkout />
               </div>
             </Grid>

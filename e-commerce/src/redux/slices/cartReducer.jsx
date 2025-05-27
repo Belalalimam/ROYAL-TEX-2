@@ -9,6 +9,15 @@ const cartSlice = createSlice({
         setCartItem(state, action) {
             state.item = action.payload;
         },
+        updateCart(state, action) {
+            const { productId, quantity, productPrice } = action.payload;
+            const itemIndex = state.item.items.findIndex((item) => item.productId.toString() === productId);
+            if (itemIndex !== -1) {
+                state.item.items[itemIndex].quantity = quantity;
+                state.item.items[itemIndex].productPrice = productPrice;
+                state.item.totalAmount = state.item.calculateTotal();
+            }
+        },
         clearCart: (state) => {
             state.item = null;
           }

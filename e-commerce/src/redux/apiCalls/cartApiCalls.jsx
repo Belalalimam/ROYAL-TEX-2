@@ -19,18 +19,23 @@ export function getUserProfileCart() {
     }
 }
 
-export const updateCartQuantity = (itemId, quantity) => {
+export const updateCartQuantity = (productId, quantity) => {
   return async (dispatch, getState) => {
     try {
       const { auth } = getState();
+      console.log(productId, quantity);
       
-      // Make sure quantity is a number and greater than 0
+      // Fix the validation logic
       const validQuantity = parseInt(quantity);
-      if (!validQuantity || validQuantity < 1) {
+      console.log("Original quantity:", quantity, "Parsed quantity:", validQuantity);
+
+      // Check if parsing failed or if quantity is not positive
+      if (isNaN(validQuantity) || validQuantity < 1) {
+        console.error("Invalid quantity:", quantity, "Parsed:", validQuantity);
         throw new Error("Quantity must be a positive number");
       }
 
-      const response = await request.put(`/api/cart/${itemId}`, {
+      const response = await request.put(`/api/cart/${productId}`, {
         quantity: validQuantity
       }, {
         headers: {
@@ -63,8 +68,6 @@ export function putCartForProduct(productId, quantity, productPrice) {
         }
     }
 }
-
-
 
 // Remove cart item
 export function deleteCartForProduct(productId) {
@@ -108,7 +111,6 @@ export function checkoutCart(shippingAddress, navigate) {
         }
     }
 }
-
 
 clearCart: (state) => {
     state.item = null;
