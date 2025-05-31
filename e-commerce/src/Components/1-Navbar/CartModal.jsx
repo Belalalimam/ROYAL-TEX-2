@@ -101,7 +101,7 @@ const CartModal = () => {
     return cartItem ? cartItem.quantity : 1;
   };
 
-  const handleQuantityChange = (productId, newQuantity) => {
+  const handleQuantityChange = async (productId, newQuantity) => {
     const quantity = parseInt(newQuantity);
     console.log("Changing quantity for product:", productId, "to:", quantity);
 
@@ -125,12 +125,13 @@ const CartModal = () => {
     const itemId = cartItem._id;
     console.log("Updating cart item:", itemId, "with quantity:", quantity);
 
-    dispatch(updateCartQuantity(itemId, quantity));
-    
-    
-    useEffect(() => {
-      Loading(true);
-    }, [dispatch]);
+    try {
+      await dispatch(updateCartQuantity(itemId, quantity));
+      // إعادة تحميل السلة بعد التحديث
+      await dispatch(getUserProfileCart());
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    }
   };
 
   const toggleFavorite = (productId) => {
@@ -145,6 +146,7 @@ const CartModal = () => {
     return like?.some(item => item.productId === productId);
   };
 
+  // useEffect لتحميل البيانات عند تحميل المكون
   useEffect(() => {
     const fetchData = async () => {
       if (user) {
@@ -165,6 +167,13 @@ const CartModal = () => {
 
     fetchData();
   }, [user, dispatch]);
+
+  // useEffect لإعادة تحميل السلة عند تغيير البيانات
+  useEffect(() => {
+    if (user && !loading) {
+      dispatch(getUserProfileCart());
+    }
+  }, [user, dispatch, loading]);
 
   // Show loading state
   if (loading || cartLoading) {
