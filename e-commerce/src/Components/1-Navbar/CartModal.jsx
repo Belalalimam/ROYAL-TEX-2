@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
   Container,
@@ -29,6 +29,7 @@ import { useNavigate } from "react-router-dom";
 import CardProucts from '../4-Products/CardProduct';
 import Checkout from "./checkout/checkout";
 
+
 const CartModal = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -41,18 +42,13 @@ const CartModal = () => {
   const [loading, setLoading] = useState(true);
 
   const { user } = useSelector((state) => state.auth);
-  const { like } = useSelector(state => state.like);
   const { product } = useSelector(state => state.product);
+  const { like } = useSelector(state => state.like);
   const { item, loading: cartLoading, error } = useSelector(state => state.cart) || {};
 
   // Fix cart data access - handle different possible structures
   const cart = item?.items || item || [];
 
-  // console.log("Cart data:", cart);
-  // console.log("Products data:", product);
-  // console.log("Full cart item:", item);
-
-  // Improved product filtering with better error handling
   const cartProducts = React.useMemo(() => {
     if (!product || !Array.isArray(product) || !cart || !Array.isArray(cart)) {
       console.log("Missing data - product:", !!product, "cart:", !!cart);
@@ -134,17 +130,21 @@ const CartModal = () => {
     }
   };
 
-  const toggleFavorite = (productId) => {
-    dispatch(putLikeForProduct(productId));
-  };
+
 
   const handleCardClick = (product) => {
     navigate(`/getProduct/${product._id}`);
   };
 
-  const isProductLiked = (productId) => {
-    return like?.some(item => item.productId === productId);
-  };
+   const handleAddToFavorites = (e, productId) => {
+      e.stopPropagation();
+  
+      if (!user) {
+        toast.error("Please login to add items to favorites!");
+        return;
+      }
+      dispatch(putLikeForProduct(productId));
+    };
 
   // useEffect لتحميل البيانات عند تحميل المكون
   useEffect(() => {
@@ -174,6 +174,18 @@ const CartModal = () => {
       dispatch(getUserProfileCart());
     }
   }, [user, dispatch, loading]);
+
+
+  const totalPrice = React.useMemo(() => {
+    if (!cartProducts || cartProducts.length === 0) return 0;
+
+    return cartProducts.reduce((total, product) => {
+      const quantity = getQuantityForProduct(product._id);
+      const price = parseFloat(product.productPrice) || 0;
+      return total + (price * quantity);
+    }, 0);
+  }, [cartProducts, cart]);
+
 
   // Show loading state
   if (loading || cartLoading) {
@@ -210,18 +222,26 @@ const CartModal = () => {
   return (
     <Box sx={{ backgroundColor: theme.palette.background.default, py: 4 }}>
       <Container maxWidth="xl">
-        <Typography
-          variant="h4"
-          component="h1"
-          gutterBottom
-          sx={{
-            fontWeight: 600,
-            mb: 3,
-            textAlign: { xs: 'center', md: 'left' }
-          }}
-        >
-          Your Shopping Cart ({cart.length} items)
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{
+              fontWeight: 600,
+              textAlign: { xs: 'center', md: 'left' }
+            }}
+          >
+            Your Shopping Cart ({cart.length} items)
+          </Typography>
+          <Typography
+            variant="h5"
+            color="primary"
+            sx={{ fontWeight: 600 }}
+          >
+            Total: ${totalPrice.toFixed(2)}
+          </Typography>
+        </Box>
+
 
         {cart.length > 0 && cartProducts.length > 0 ? (
           <Grid container spacing={3}>
@@ -329,12 +349,10 @@ const CartModal = () => {
 
                           <Box sx={{ display: 'flex', gap: 1 }}>
                             <IconButton
-                              color={isProductLiked(product._id) ? "error" : "default"}
-                              onClick={() => toggleFavorite(product._id)}
-                              size="small"
-                              sx={{ border: '1px solid #e0e0e0' }}
+                              onClick={(e) => handleAddToFavorites(e, product._id)}
+                              sx={{color: Array.isArray(like) && like.some(item => item._id === product._id) ? "red" : "#d2d2d2"}}
                             >
-                              {isProductLiked(product._id) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                              <FavoriteIcon />
                             </IconButton>
 
                             <Button

@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CloseIcon from "@mui/icons-material/Close";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping"; 
 import { toast } from "react-toastify";
 
 import { putLikeForProduct } from '../../redux/apiCalls/likeApiCalls';

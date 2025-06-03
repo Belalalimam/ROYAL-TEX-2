@@ -135,16 +135,16 @@ const CategoryModal = ({ product, open, onClose, handleCardClick }) => {
         </Box>
         <Box sx={{ width: { xs: '100%', sm: '50%' }, height: '100%' }} className="">
           <Typography variant="body2" sx={{ mb: 1, fontSize: { xs: '1.3rem', sm: '1.5rem' } }}>
-          <span style={{color:"#052659"}}>Description</span> : {product.productDescription}
+            <span style={{ color: "#052659" }}>Description</span> : {product.productDescription}
           </Typography>
           <Typography variant="body2" sx={{ mb: 1, fontSize: { xs: '1.3rem', sm: '1.5rem' } }}>
-            <span style={{color:"#052659"}}>Category</span> : {product.productCategory}
+            <span style={{ color: "#052659" }}>Category</span> : {product.productCategory}
           </Typography>
           <Typography variant="body2" sx={{ mb: 1, fontSize: { xs: '1.3rem', sm: '1.5rem' } }}>
-            <span style={{color:"#052659"}}>Color</span> : {product.productColor}
+            <span style={{ color: "#052659" }}>Color</span> : {product.productColor}
           </Typography>
           <Typography variant="body2" sx={{ mb: 1, fontSize: { xs: '1.3rem', sm: '1.5rem' } }}>
-            <span style={{color:"#052659"}}>Size</span> : {product.productCategorySize}
+            <span style={{ color: "#052659" }}>Size</span> : {product.productCategorySize}
           </Typography>
         </Box>
       </DialogContent>
@@ -179,16 +179,27 @@ const CategoryPage = () => {
     }
     dispatch(fetchProduct());
   }, [dispatch, id]);
-  const handleAddToCart = (e, productId) => {
+
+  const handleAddToCart = (e, productPrice = null) => {
     e.stopPropagation();
     if (!user) {
       toast.error("Please login to add items to cart!");
       return;
     }
-    dispatch(putCartForProduct(productId, quantity));
+
+    const price = productPrice || productSingle?.productPrice;
+
+    if (!price) {
+      toast.error("Product price not available!");
+      return;
+    }
+
+    dispatch(putCartForProduct(productId, quantity, price));
     toast.success("Product added to cart!");
   };
-  const handleAddToFavorites = (e, productId) => {
+
+
+  const handleAddToFavorites = (e) => {
     e.stopPropagation();
 
     if (!user) {
@@ -214,7 +225,7 @@ const CategoryPage = () => {
 
   return (
     <>
-    <Container maxWidth="xxl" sx={{ py: 4 }}>
+      <Container maxWidth="xxl" sx={{ py: 4 }}>
         {productSingle && (
           <>
             {/* Breadcrumbs */}
@@ -290,31 +301,44 @@ const CategoryPage = () => {
                       </Typography>
                       <IconButton
                         onClick={() => setQuantity(quantity + 1)}
-                        disabled={quantity >= 10}
+                        disabled={quantity >= 5}
                       >
                         <AddIcon />
                       </IconButton>
                     </Box>
                   </Box>
 
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    startIcon={<ShoppingBagIcon />}
-                    onClick={handleAddToCart}
-                    sx={{ mb: 2 }}
-                  >
+
+                  <Button variant="outlined" color="primary" fullWidth onClick={(e) => handleAddToCart(e, product.productPrice)}>
+                    <IconButton>
+                      <ShoppingCartIcon />
+                    </IconButton>
                     Add to Cart
                   </Button>
 
-                  <Button
-                    variant="outlined"
-                    startIcon={<FavoriteIcon />}
-                    onClick={handleAddToFavorites}
-                    fullWidth
-                  >
-                    {productSingle?.likes?.includes(user?._id) ? "Remove from Wishlist" : "Add to Wishlist"}
+
+
+
+                  <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={(e) => handleAddToFavorites(e)}>
+                    <IconButton
+
+                      sx={{ color: Array.isArray(like) && like.some(item => item._id === productId) ? "red" : "#d2d2d2" }}
+                    >
+                      <FavoriteIcon />
+                    </IconButton>
+                    {Array.isArray(like) && like.some(item => item._id === productId) ? "Remove from Wishlist" : "Add to Wishlist"}
                   </Button>
+
+
+                  {/* <IconButton
+                    onClick={(e) => handleAddToFavorites(e)}
+                    sx={{ color: Array.isArray(like) && like.some(item => item._id === productId) ? "red" : "#d2d2d2" }}
+                  >
+                    <FavoriteIcon />
+                     {productSingle?.likes?.includes(user?._id) ? "Remove from Wishlist" : "Add to Wishlist"} 
+                    {Array.isArray(like) && like.some(item => item._id === productId) ? "Remove from Wishlist" : "Add to Wishlist"}
+                  </IconButton> */}
+
 
                   <Box sx={{ mt: 3, p: 2, bgcolor: "grey.100", borderRadius: 1 }}>
                     <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
@@ -334,7 +358,7 @@ const CategoryPage = () => {
       {/* Similar Products Section  */}
       <Box sx={{ py: 8, backgroundColor: "#fff" }}>
         <Container maxWidth="xxl" className=" CardProductContaienr">
-          <Typography  variant='h3' align="center" sx={{ mb: { xs: 2, sm: 3, md: 5 }, fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }, fontWeight: 600, color: "#1a1a1a" }}>
+          <Typography variant='h3' align="center" sx={{ mb: { xs: 2, sm: 3, md: 5 }, fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }, fontWeight: 600, color: "#1a1a1a" }}>
             Similar Products
           </Typography>
 
@@ -410,7 +434,7 @@ const CategoryPage = () => {
               </Typography>
             )}
           </Grid>
-          
+
 
 
           <CategoryModal

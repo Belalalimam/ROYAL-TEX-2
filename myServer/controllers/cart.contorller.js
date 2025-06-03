@@ -188,11 +188,11 @@ const getCart = asyncWrapper(async (req, res) => {
  * @access  private
  ------------------------------------------------*/
 const removeFromCart = asyncWrapper(async (req, res) => {
-  const { itemId } = req.params;
+  const { productId } = req.params;
   const userId = req.user.id;
 
-  if (!itemId) {
-    return res.status(400).json({ message: "Item ID is required" });
+  if (!productId) {
+    return res.status(400).json({ message: "Product ID is required" });
   }
 
   const cart = await Carts.findOne({ userId });
@@ -200,13 +200,19 @@ const removeFromCart = asyncWrapper(async (req, res) => {
     return res.status(404).json({ message: "Cart not found" });
   }
 
-  // Remove item from cart with proper null checks
+  // Remove item from cart by productId with proper null checks
+  const initialLength = cart.items.length;
   cart.items = cart.items.filter(item => {
-    if (!item || !item._id) {
+    if (!item || !item.productId) {
       return false;
     }
-    return item._id.toString() !== itemId.toString();
+    return item.productId.toString() !== productId.toString();
   });
+  
+  // Check if item was actually removed
+  if (cart.items.length === initialLength) {
+    return res.status(404).json({ message: "Product not found in cart" });
+  }
   
   // Calculate total
   cart.calculateTotal();
